@@ -1,239 +1,742 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>NCM Decrypt</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0f0f13;--surface:#18181b;--surface2:#1f1f23;--text:#e4e4e7;--text2:#a1a1aa;--text3:#71717a;--text4:#52525b;--border:#27272a;--accent:#7c3aed;--accent2:#6d28d9;--btn-disabled:#3f3f46;--btn-disabled-text:#71717a;--red:#dc2626;--red-hover:#b91c1c;--green:#16a34a;--green-hover:#15803d;--prog-bg:#27272a;--badge-ok-bg:#052e16;--badge-ok:#4ade80;--badge-wait-bg:#1c1917;--badge-run-bg:#1e1b4b;--badge-run:#818cf8;--badge-err-bg:#450a0a;--badge-err:#f87171;--toast-bg:#18181b;--toast-border:#27272a;--toast-shadow:0 8px 32px rgba(0,0,0,.4);--overlay:rgba(0,0,0,.6)}
-.light{--bg:#f5f5f5;--surface:#fff;--surface2:#f0f0f0;--text:#1a1a1a;--text2:#525252;--text3:#8a8a8a;--text4:#a3a3a3;--border:#d4d4d4;--btn-disabled:#e5e5e5;--btn-disabled-text:#a3a3a3;--prog-bg:#e5e5e5;--badge-ok-bg:#dcfce7;--badge-ok:#16a34a;--badge-wait-bg:#f5f5f5;--badge-run-bg:#ede9fe;--badge-run:#6d28d9;--badge-err-bg:#fde8e8;--badge-err:#dc2626;--toast-bg:#fff;--toast-border:#d4d4d4;--toast-shadow:0 8px 32px rgba(0,0,0,.1);--overlay:rgba(0,0,0,.3)}
+:root{--bg:#0f0f13;--surface:#18181b;--surface2:#1f1f23;--text:#e4e4e7;--text2:#a1a1aa;--text3:#71717a;--text4:#52525b;--border:#27272a;--accent:#7c3aed;--accent2:#6d28d9;--btn-disabled:#3f3f46;--btn-disabled-text:#71717a;--red:#dc2626;--red-hover:#b91c1c;--green:#16a34a;--green-hover:#15803d;--prog-bg:#27272a;--badge-ok-bg:#052e16;--badge-ok:#4ade80;--badge-wait-bg:#1c1917;--badge-run-bg:#1e1b4b;--badge-run:#818cf8;--badge-err-bg:#450a0a;--badge-err:#f87171;--toast-bg:#18181b;--toast-border:#27272a;--toast-shadow:0 8px 32px rgba(0,0,0,.4);--overlay:rgba(0,0,0,.6);--dir-icon:#f59e0b;--file-icon:#818cf8}
+.light{--bg:#f5f5f5;--surface:#fff;--surface2:#f0f0f0;--text:#1a1a1a;--text2:#525252;--text3:#8a8a8a;--text4:#a3a3a3;--border:#d4d4d4;--btn-disabled:#e5e5e5;--btn-disabled-text:#a3a3a3;--prog-bg:#e5e5e5;--badge-ok-bg:#dcfce7;--badge-ok:#16a34a;--badge-wait-bg:#f5f5f5;--badge-run-bg:#ede9fe;--badge-run:#6d28d9;--badge-err-bg:#fde8e8;--badge-err:#dc2626;--toast-bg:#fff;--toast-border:#d4d4d4;--toast-shadow:0 8px 32px rgba(0,0,0,.1);--overlay:rgba(0,0,0,.3);--dir-icon:#d97706;--file-icon:#6366f1}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent}
-main{max-width:860px;margin:0 auto;padding:24px 16px 60px}
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
-h1{font-size:24px;font-weight:700;background:linear-gradient(135deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.theme-btn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:18px;cursor:pointer;padding:6px 10px;line-height:1;transition:all .2s}
-.theme-btn:active{color:var(--text);border-color:var(--accent)}
+main{max-width:960px;margin:0 auto;padding:20px 16px 60px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+h1{font-size:22px;font-weight:700;background:linear-gradient(135deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.theme-btn,.lang-btn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:16px;cursor:pointer;padding:6px 10px;line-height:1;transition:all .2s;display:flex;align-items:center;gap:4px}
+.theme-btn:active,.lang-btn:active{color:var(--text);border-color:var(--accent)}
+.lang-btn{font-size:13px;padding:6px 8px}
 .toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-.btn{padding:10px 18px;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all .1s;-webkit-user-select:none;user-select:none}
+.btn{padding:10px 18px;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all .1s;-webkit-user-select:none;user-select:none;white-space:nowrap}
 .btn-primary{background:var(--accent);color:#fff}
-.btn-primary:active{background:var(--accent2)}
+.btn-primary:hover{background:var(--accent2)}
 .btn-primary:disabled{background:var(--btn-disabled);color:var(--btn-disabled-text);cursor:not-allowed}
 .btn-danger{background:var(--red);color:#fff}
-.btn-danger:active{background:var(--red-hover)}
+.btn-danger:hover{background:var(--red-hover)}
 .btn-danger:disabled{background:var(--btn-disabled);color:var(--btn-disabled-text);cursor:not-allowed}
 .btn-success{background:var(--green);color:#fff}
-.btn-success:active{background:var(--green-hover)}
+.btn-success:hover{background:var(--green-hover)}
 .btn-upload{background:var(--accent);color:#fff;padding:12px 24px;font-size:15px;display:inline-flex;align-items:center;gap:6px}
-.btn-upload:active{background:var(--accent2)}
 .btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}
-.btn-outline:active{background:var(--surface2);color:var(--text)}
-.stats{display:flex;gap:16px;margin-bottom:12px;font-size:13px;color:var(--text3);flex-wrap:wrap}
+.btn-outline:hover{background:var(--surface2);color:var(--text)}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:6px}
+.btn-icon{padding:6px 8px;font-size:14px;line-height:1;background:none;border:1px solid var(--border);border-radius:6px;color:var(--text3);cursor:pointer;transition:all .15s}
+.btn-icon:hover{color:var(--text);border-color:var(--text4)}
+.stats{display:flex;gap:16px;margin-bottom:10px;font-size:13px;color:var(--text3);flex-wrap:wrap}
 .stats span strong{color:var(--text)}
-.upload-area{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:12px 16px;background:var(--surface);border:2px dashed var(--border);border-radius:10px;flex-wrap:wrap;justify-content:center}
-.upload-area-text{font-size:13px;color:var(--text3)}
-.file-list{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
-.file-header{display:grid;grid-template-columns:32px 1fr 90px 70px;padding:10px 14px;background:var(--surface2);font-size:12px;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border)}
-.file-row{display:grid;grid-template-columns:32px 1fr 90px 70px;padding:8px 14px;border-bottom:1px solid var(--border);font-size:14px;align-items:center;transition:background .15s}
-.file-row:active{background:var(--surface2)}
-.file-row:last-child{border-bottom:none}
-.file-row .cb{justify-self:center}
-.file-row .cb input{width:18px;height:18px;cursor:pointer;accent-color:var(--accent)}
-.file-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 4px;color:var(--text)}
-.file-size{color:var(--text3);font-size:13px;text-align:right}
-.file-status{text-align:center;font-size:13px}
-.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500}
-.badge-ok{background:var(--badge-ok-bg);color:var(--badge-ok)}
-.badge-wait{background:var(--badge-wait-bg);color:var(--badge-wait)}
-.badge-run{background:var(--badge-run-bg);color:var(--badge-run)}
-.badge-err{background:var(--badge-err-bg);color:var(--badge-err)}
-.progress-cell{padding:4px 14px}
-.progress-bar{height:4px;background:var(--prog-bg);border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;background:var(--prog-fill);border-radius:2px;transition:width .3s ease;width:0%;background:linear-gradient(90deg,#7c3aed,#6366f1)}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2);font-size:12px;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px}
+.panel-header .left{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.panel-body{padding:0}
+.breadcrumb{display:flex;align-items:center;gap:4px;padding:8px 14px;border-bottom:1px solid var(--border);font-size:13px;overflow-x:auto;flex-wrap:wrap}
+.breadcrumb a{color:var(--accent);cursor:pointer;text-decoration:none;white-space:nowrap}
+.breadcrumb a:hover{text-decoration:underline}
+.breadcrumb span{color:var(--text3);margin:0 2px}
 .empty-state{text-align:center;padding:40px 24px;color:var(--text4)}
 .empty-state .icon{font-size:48px;margin-bottom:8px}
 .empty-state p{margin-top:6px;font-size:14px}
-.section-title{font-size:13px;font-weight:600;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--toast-bg);border:1px solid var(--toast-border);border-radius:10px;padding:12px 20px;font-size:14px;z-index:10000;display:none;max-width:360px;width:90%;box-shadow:var(--toast-shadow);text-align:center}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--toast-bg);border:1px solid var(--toast-border);border-radius:10px;padding:12px 20px;font-size:14px;z-index:10000;display:none;max-width:380px;width:90%;box-shadow:var(--toast-shadow);text-align:center;color:var(--text)}
 .toast.show{display:block;animation:fadeIn .25s}
 @keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-
-/* ---- Settings rows ---- */
-.config-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.config-row label{font-size:14px;color:var(--text2);min-width:80px}
-.config-path{font-size:13px;color:var(--accent);cursor:pointer;padding:4px 8px;border-radius:4px;border:1px solid var(--border);background:var(--surface);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:border-color .2s}
-.config-path:active{border-color:var(--accent)}
-.config-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
-
-/* ---- Directory picker modal ---- */
-.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--overlay);z-index:9999;justify-content:center;align-items:center;padding:16px}
-.modal-overlay.active{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:100%;max-width:480px;max-height:80vh;display:flex;flex-direction:column;box-shadow:var(--toast-shadow)}
-.modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
-.modal-header h2{font-size:16px;font-weight:600}
-.modal-close{background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;padding:0 4px}
-.modal-body{flex:1;overflow-y:auto;padding:0}
-.modal-path{display:flex;align-items:center;gap:6px;padding:10px 16px;border-bottom:1px solid var(--border)}
-.modal-path input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px 10px;font-size:13px;font-family:monospace}
-.modal-path button{padding:8px 12px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-size:13px;cursor:pointer}
-.dir-list{padding:4px 0}
-.dir-item{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s}
-.dir-item:active{background:var(--surface2)}
-.dir-item:last-child{border-bottom:none}
-.dir-item .name{font-size:14px;color:var(--text)}
-.dir-item .arrow{color:var(--text3);font-size:16px}
-.shortcuts{padding:8px 16px 12px;border-top:1px solid var(--border)}
-.shortcuts-title{font-size:12px;color:var(--text4);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
-.shortcut-item{display:inline-block;padding:6px 12px;margin:3px;border-radius:6px;border:1px solid var(--border);font-size:13px;color:var(--text2);cursor:pointer;transition:all .1s}
-.shortcut-item:active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.modal-footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--border)}
-.modal-footer .btn{padding:8px 20px;font-size:14px}
-
+/* Auth screen */
+.auth-screen{display:flex;justify-content:center;align-items:center;min-height:80vh}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px 28px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,.3)}
+.auth-card h1{text-align:center;margin-bottom:20px}
+.auth-tabs{display:flex;gap:0;margin-bottom:20px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.auth-tab{flex:1;padding:10px;border:none;background:transparent;color:var(--text3);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s}
+.auth-tab.active{background:var(--accent);color:#fff}
+.auth-form{display:none;flex-direction:column;gap:14px}
+.auth-form.active{display:flex}
+.auth-form input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:15px;outline:none;transition:border-color .2s}
+.auth-form input:focus{border-color:var(--accent)}
+.auth-form input::placeholder{color:var(--text4)}
+.auth-form .btn{width:100%;padding:12px;font-size:15px}
+.auth-error{font-size:13px;text-align:center;display:none;padding:4px 0}
+.auth-badge{display:inline-flex;align-items:center;gap:6px;background:var(--badge-run-bg);color:var(--badge-run);padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500}
+.auth-badge button{background:none;border:none;color:var(--badge-run);cursor:pointer;font-size:14px;padding:0 2px}
+/* File listing */
+.file-grid{display:grid;grid-template-columns:auto 1fr auto auto;gap:0}
+.file-grid-header{display:contents}
+.file-grid-header > div{padding:8px 14px;background:var(--surface2);font-size:12px;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border)}
+.file-row{display:contents;cursor:pointer}
+.file-row > div{padding:8px 14px;border-bottom:1px solid var(--border);font-size:14px;display:flex;align-items:center;gap:6px;transition:background .1s}
+.file-row:hover > div{background:var(--surface2)}
+.file-row:last-child > div{border-bottom:none}
+.file-icon{font-size:16px;flex-shrink:0}
+.file-icon-dir{color:var(--dir-icon)}
+.file-icon-file{color:var(--file-icon)}
+.file-icon-ncm{color:var(--accent)}
+.file-name-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-actions{display:flex;gap:4px;justify-content:flex-end}
+.file-size-text{font-size:13px;color:var(--text3);white-space:nowrap;text-align:right}
+.selected-row > div{background:var(--badge-run-bg) !important}
+/* Progress */
+.progress-item{padding:8px 14px;border-bottom:1px solid var(--border)}
+.progress-item:last-child{border-bottom:none}
+.progress-header{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+.progress-bar{height:4px;background:var(--prog-bg);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;transition:width .3s ease;width:0%;background:linear-gradient(90deg,#7c3aed,#6366f1)}
+/* Output listing */
+.output-list{padding:4px 0}
 .output-item{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:14px;border-bottom:1px solid var(--border)}
 .output-item:last-child{border-bottom:none}
 .output-item a{color:var(--accent);text-decoration:none;font-weight:500;padding:4px 0}
-.output-item a:active{text-decoration:underline}
-
+.output-item a:hover{text-decoration:underline}
+/* Settings */
+details.settings-panel{margin-bottom:12px}
+.settings-panel summary{padding:8px 14px;cursor:pointer;font-size:14px;font-weight:500;color:var(--text2);border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+.settings-panel summary:hover{color:var(--text)}
+.settings-body{padding:10px 14px;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;background:var(--surface)}
+.config-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.config-row label{font-size:14px;color:var(--text2);min-width:80px}
+.config-path{font-size:13px;color:var(--accent);cursor:pointer;padding:4px 8px;border-radius:4px;border:1px solid var(--border);background:var(--surface);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.config-path:active{border-color:var(--accent)}
+.config-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
+/* Modal */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--overlay);z-index:9999;justify-content:center;align-items:center;padding:16px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:100%;max-width:420px;box-shadow:var(--toast-shadow)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
+.modal-header h2{font-size:16px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;padding:0 4px}
+.modal-body{padding:16px}
+.modal-body input[type=text]{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px;outline:none}
+.modal-body input[type=text]:focus{border-color:var(--accent)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--border)}
+.modal-footer .btn{padding:8px 20px;font-size:14px}
+/* Upload area */
+.upload-area{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:10px 14px;background:var(--surface);border:2px dashed var(--border);border-radius:10px;flex-wrap:wrap}
+.upload-area-text{font-size:12px;color:var(--text3);flex:1}
+/* Language selector dropdown */
+.lang-dropdown{position:relative;display:inline-block}
+.lang-dropdown-content{display:none;position:absolute;right:0;top:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;z-index:100;min-width:140px;box-shadow:var(--toast-shadow);margin-top:4px}
+.lang-dropdown-content.show{display:block}
+.lang-option{padding:8px 14px;cursor:pointer;font-size:13px;color:var(--text2);border-bottom:1px solid var(--border);transition:background .1s}
+.lang-option:last-child{border-bottom:none}
+.lang-option:hover{background:var(--surface2);color:var(--text)}
+.lang-option.active{color:var(--accent);font-weight:600}
+/* Dir picker modal */
+.dir-list{padding:4px 0}
+.dir-item{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s}
+.dir-item:hover{background:var(--surface2)}
+.dir-item:last-child{border-bottom:none}
+.dir-item .name{font-size:14px}
+.dir-item .arrow{color:var(--text3);font-size:16px}
+.modal-path{display:flex;align-items:center;gap:6px;padding:10px 16px;border-bottom:1px solid var(--border)}
+.modal-path input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px 10px;font-size:13px;font-family:monospace}
+.modal-path button{padding:8px 12px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-size:13px;cursor:pointer}
+.shortcuts{padding:8px 16px 12px;border-top:1px solid var(--border)}
+.shortcuts-title{font-size:12px;color:var(--text4);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.shortcut-item{display:inline-block;padding:6px 12px;margin:3px;border-radius:6px;border:1px solid var(--border);font-size:13px;color:var(--text2);cursor:pointer;transition:all .1s}
+.shortcut-item:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 @media(max-width:600px){
-main{padding:16px 10px 40px}
-h1{font-size:20px}
-.toolbar{gap:6px}
-.btn{padding:10px 14px;font-size:13px}
+main{padding:14px 8px 40px}
+h1{font-size:18px}
+.toolbar{gap:4px}
+.btn{padding:8px 12px;font-size:12px}
 .btn-upload{width:100%;justify-content:center}
-.upload-area{flex-direction:column;padding:10px;gap:8px}
-.stats{font-size:12px;gap:10px}
-.file-header,.file-row{grid-template-columns:28px 1fr 55px 48px;padding:8px 10px;font-size:13px}
-.modal{max-height:90vh}
+.upload-area{flex-direction:column;padding:8px;gap:6px}
+.stats{font-size:11px;gap:8px}
+.file-grid-header > div,.file-row > div{padding:6px 10px;font-size:13px}
+.file-actions{gap:2px}
+.btn-sm{padding:4px 8px;font-size:11px}
+.auth-card{padding:24px 18px}
 }
 </style>
 </head>
 <body>
 <main>
   <header>
-    <h1>NCM Decrypt</h1>
-    <button class="theme-btn" id="themeToggle" onclick="toggleTheme()" title="切换主题">&#x263e;</button>
+    <h1 id="title">NCM Decrypt</h1>
+    <div class="header-right">
+      <span class="auth-badge" id="userBadge" style="display:none">
+        <span id="userName"></span>
+        <button onclick="logout()" title="Logout">&times;</button>
+      </span>
+      <div class="lang-dropdown">
+        <button class="lang-btn" id="langBtn" onclick="toggleLangDropdown()">&#x1f310; <span id="langLabel">EN</span></button>
+        <div class="lang-dropdown-content" id="langDropdown"></div>
+      </div>
+      <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">&#x263e;</button>
+    </div>
   </header>
 
-  <div class="upload-area" id="uploadArea">
-    <button class="btn btn-upload" id="uploadBtn" onclick="pickFiles()">&#x1f4c2; 选择 .ncm 文件</button>
-    <span class="upload-area-text">或复制文件到数据目录后点刷新</span>
-    <input type="file" id="fileInput" accept=".ncm" multiple style="display:none">
-  </div>
-
-  <div class="toolbar">
-    <button class="btn btn-primary" onclick="loadFiles()">&#x21bb; 刷新</button>
-    <button class="btn btn-success" id="btnDecrypt" onclick="startDecrypt()" disabled>&#x25b6; 解密选中</button>
-    <button class="btn btn-danger" id="btnClean" onclick="cleanFiles()" disabled>&#x1f5d1; 删源文件</button>
-    <button class="btn btn-outline" onclick="dedupFiles()">去重</button>
-    <button class="btn btn-outline" onclick="selectAll(true)">全选</button>
-    <button class="btn btn-outline" onclick="selectAll(false)">取消</button>
-  </div>
-
-  <div class="stats">
-    <span>文件: <strong id="statTotal">0</strong></span>
-    <span>已解密: <strong id="statDone">0</strong></span>
-    <span>重复: <strong id="statDup">0</strong></span>
-  </div>
-
-  <details style="margin-bottom:12px" id="settingsPanel">
-    <summary>设置</summary>
-    <div style="padding:10px 0">
-      <div class="config-row">
-        <label>数据目录</label>
-        <div class="config-path" id="dataDirDisplay" onclick="openDirPicker('data')"></div>
+  <!-- Auth Screen -->
+  <div id="authScreen" class="auth-screen" style="display:none">
+    <div class="auth-card">
+      <h1>NCM Decrypt</h1>
+      <p id="loginTitle" style="text-align:center;color:var(--text3);font-size:13px;margin-bottom:20px">Please login to continue</p>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</button>
       </div>
-      <div class="config-row">
-        <label>输出目录</label>
-        <div class="config-path" id="outDirDisplay" onclick="openDirPicker('output')"></div>
+      <div class="auth-form active" id="loginForm">
+        <div class="auth-error" id="loginError"></div>
+        <input type="text" id="loginUser" placeholder="Username" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
+        <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="btn btn-primary" onclick="doLogin()">Login</button>
       </div>
-      <div class="config-row">
-        <label><input type="checkbox" id="autoClean"> 解密后自动删除源文件</label>
+      <div class="auth-form" id="registerForm">
+        <div class="auth-error" id="registerError"></div>
+        <input type="text" id="regUser" placeholder="Username" autocomplete="off" onkeydown="if(event.key==='Enter')doRegister()">
+        <input type="password" id="regPass" placeholder="Password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
+        <button class="btn btn-success" onclick="doRegister()">Register</button>
       </div>
     </div>
-  </details>
-
-  <div id="emptyState" class="empty-state">
-    <div class="icon">&#x1f3b5;</div>
-    <p>把 .ncm 文件放到 <strong id="emptyDir" style="color:var(--text)">./</strong> 目录后点刷新</p>
-    <p style="color:var(--text4);font-size:12px;margin-top:4px">或点上方按钮选择文件上传</p>
   </div>
 
-  <div id="fileList" style="display:none">
-    <div class="file-list">
-      <div class="file-header">
-        <span></span>
-        <span>文件名</span>
-        <span style="text-align:right">大小</span>
-        <span style="text-align:center">状态</span>
-      </div>
-      <div id="fileRows"></div>
+  <!-- App Screen -->
+  <div id="appScreen" style="display:none">
+    <!-- Upload -->
+    <div class="upload-area">
+      <button class="btn btn-upload" onclick="pickFiles()">&#x1f4c2; <span id="uploadBtnText">Select .ncm files</span></button>
+      <span class="upload-area-text" id="uploadHint">Upload files to your personal space</span>
+      <input type="file" id="fileInput" accept=".ncm" multiple style="display:none">
     </div>
-  </div>
 
-  <div id="progressSection" style="display:none;margin-bottom:16px">
-    <div class="section-title">处理进度</div>
-    <div class="file-list" id="progressList"></div>
-  </div>
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <button class="btn btn-primary" onclick="refreshAll()">&#x21bb; <span>Refresh</span></button>
+      <button class="btn btn-success" id="btnDecrypt" onclick="startDecrypt()" disabled>&#x25b6; <span>Decrypt selected</span></button>
+      <button class="btn btn-outline" onclick="showMkdirModal()">&#x1f4c1; <span>New Folder</span></button>
+      <button class="btn btn-outline" onclick="selectAll()">&#x2611; <span>Select all</span></button>
+      <button class="btn btn-outline" onclick="deselectAll()">&#x2610; <span>Deselect</span></button>
+    </div>
 
-  <div id="outputSection" style="display:none">
-    <div class="section-title">已解密的文件</div>
-    <div id="outputList"></div>
+    <!-- Stats -->
+    <div class="stats">
+      <span><span id="statFilesLabel">Files</span>: <strong id="statTotal">0</strong></span>
+      <span><span id="statDecryptedLabel">Decrypted</span>: <strong id="statDone">0</strong></span>
+      <span><span id="statDupLabel">Duplicates</span>: <strong id="statDup">0</strong></span>
+    </div>
+
+    <!-- File Browser -->
+    <div class="panel" id="fileBrowser">
+      <div class="panel-header">
+        <div class="left">
+          <span id="browserTitle">File Browser</span>
+          <span style="color:var(--text4);font-size:11px" id="currentPath">/</span>
+        </div>
+        <div style="display:flex;gap:4px">
+          <button class="btn-icon" onclick="loadFileList()" title="Refresh">&#x21bb;</button>
+          <button class="btn-icon" onclick="showUploadArea()" title="Upload">&#x1f4c2;</button>
+        </div>
+      </div>
+      <div class="breadcrumb" id="breadcrumb"></div>
+      <div class="panel-body" id="fileListContainer">
+        <div class="empty-state" id="fileEmpty">
+          <div class="icon">&#x1f3b5;</div>
+          <p id="noFilesText">No .ncm files found</p>
+          <p style="color:var(--text4);font-size:12px;margin-top:4px" id="uploadOrCopyText">Upload .ncm files or copy them to your data directory</p>
+        </div>
+        <div id="fileGridContainer" style="display:none">
+          <div class="file-grid" id="fileGridHeader">
+            <div class="file-grid-header">
+              <div></div>
+              <div id="nameHeader">Name</div>
+              <div style="text-align:right" id="sizeHeader">Size</div>
+              <div id="actionHeader" style="text-align:right">Actions</div>
+            </div>
+          </div>
+          <div id="fileGrid" class="file-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="panel" id="progressSection" style="display:none">
+      <div class="panel-header">
+        <span id="progressTitle">Progress</span>
+      </div>
+      <div id="progressList"></div>
+    </div>
+
+    <!-- Output -->
+    <div class="panel" id="outputSection" style="display:none">
+      <div class="panel-header">
+        <span id="outputTitle">Decrypted files</span>
+      </div>
+      <div class="output-list" id="outputList"></div>
+    </div>
+
+    <!-- Settings -->
+    <details class="settings-panel" id="settingsPanel">
+      <summary id="settingsSummary">Settings</summary>
+      <div class="settings-body">
+        <div class="config-row" id="configDataDir">
+          <label id="dataDirLabel">Data directory</label>
+          <div class="config-path" id="dataDirDisplay" onclick="openDirPicker('data')"></div>
+        </div>
+        <div class="config-row" id="configOutDir">
+          <label id="outDirLabel">Output directory</label>
+          <div class="config-path" id="outDirDisplay" onclick="openDirPicker('output')"></div>
+        </div>
+        <div class="config-row">
+          <label><input type="checkbox" id="autoClean"> <span id="autoCleanLabel">Auto-delete source after decrypt</span></label>
+        </div>
+      </div>
+    </details>
   </div>
 </main>
 
-<!-- Cross-directory Dedup Dialog -->
-<div class="modal-overlay" id="dedupModal">
+<!-- Mkdir Modal -->
+<div class="modal-overlay" id="mkdirModal">
   <div class="modal">
     <div class="modal-header">
-      <h2>文件已解密过</h2>
-      <button class="modal-close" onclick="closeDedup()">&times;</button>
+      <h2 id="mkdirTitle">New Folder</h2>
+      <button class="modal-close" onclick="closeModal('mkdirModal')">&times;</button>
     </div>
-    <div class="modal-body" style="padding:16px">
-      <p style="margin-bottom:12px;font-size:14px;color:var(--text)" id="dedupMsg"></p>
-      <p style="font-size:13px;color:var(--text3);margin-bottom:16px" id="dedupSource"></p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-primary" onclick='dedupAction("copy")'>复制到此目录</button>
-        <button class="btn btn-outline" onclick='dedupAction("move")'>移动到此目录</button>
-        <button class="btn btn-outline" onclick='dedupAction("skip")'>跳过，重新解密</button>
-      </div>
+    <div class="modal-body">
+      <input type="text" id="mkdirInput" placeholder="Folder name" onkeydown="if(event.key==='Enter')doMkdir()">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('mkdirModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="doMkdir()">Confirm</button>
     </div>
   </div>
 </div>
 
+<!-- Rename Modal -->
+<div class="modal-overlay" id="renameModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="renameTitle">Rename</h2>
+      <button class="modal-close" onclick="closeModal('renameModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="text" id="renameInput" placeholder="New name" onkeydown="if(event.key==='Enter')doRename()">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('renameModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="doRename()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="deleteTitle">Confirm Delete</h2>
+      <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p id="deleteMsg" style="font-size:14px;color:var(--text3)">Are you sure you want to delete this?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn btn-danger" id="deleteConfirmBtn" onclick="doDelete()">Delete</button>
+    </div>
+  </div>
+</div>
 
 <!-- Directory Picker Modal -->
 <div class="modal-overlay" id="dirModal">
   <div class="modal">
     <div class="modal-header">
-      <h2 id="dirModalTitle">选择目录</h2>
+      <h2 id="dirModalTitle">Select directory</h2>
       <button class="modal-close" onclick="closeDirPicker()">&times;</button>
     </div>
     <div class="modal-path">
       <input type="text" id="dirPathInput" onkeydown="if(event.key==='Enter')navigateTo(this.value)">
-      <button onclick="navigateTo(document.getElementById('dirPathInput').value)">跳转</button>
+      <button onclick="navigateTo(document.getElementById('dirPathInput').value)">Go</button>
     </div>
     <div class="modal-body">
       <div class="dir-list" id="dirList"></div>
-      <div class="shortcuts" id="shortcutsList">
-        <div class="shortcuts-title">快捷选择</div>
+      <div class="shortcuts">
+        <div class="shortcuts-title" id="shortcutsTitle">Shortcuts</div>
         <div id="shortcutItems"></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeDirPicker()">取消</button>
-      <button class="btn btn-primary" id="dirConfirmBtn" onclick="confirmDir()">确定</button>
+      <button class="btn btn-outline" onclick="closeDirPicker()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmDir()">Confirm</button>
     </div>
   </div>
 </div>
 
 <script>
+// ============================================================
+// i18n System - Robust multi-language support
+// ============================================================
+var LANG = {
+  current: 'en',
+  strings: {},
+  loaded: false,
+  localeNames: { 'en': 'EN', 'zh-CN': '简', 'zh-TW': '繁', 'ko': 'KO', 'ja': 'JA' },
+
+  init: function() {
+    var saved = localStorage.getItem('ncm_lang');
+    var fullLocale = (navigator.language || 'en').toLowerCase();
+    if (fullLocale === 'zh-cn' || fullLocale === 'zh-sg') fullLocale = 'zh-CN';
+    else if (fullLocale === 'zh-tw' || fullLocale === 'zh-hk' || fullLocale === 'zh-mo') fullLocale = 'zh-TW';
+    else if (fullLocale.startsWith('zh')) fullLocale = 'zh-CN';
+    else if (fullLocale.startsWith('ko')) fullLocale = 'ko';
+    else if (fullLocale.startsWith('ja')) fullLocale = 'ja';
+    else fullLocale = 'en';
+    this.current = saved || fullLocale;
+    return this.load();
+  },
+
+  load: function() {
+    var self = this;
+    return fetch('/api/lang?locale=' + this.current)
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        self.strings = data.strings || {};
+        self.loaded = true;
+        document.title = self.__('app_title', 'NCM Decrypt');
+        renderAll();
+      })
+      .catch(function() {
+        self.loaded = true;
+        renderAll();
+      });
+  },
+
+  __: function(key, fallback) {
+    if (this.strings && this.strings[key]) return this.strings[key];
+    return fallback || key;
+  },
+
+  updateLangLabel: function() {
+    var label = document.getElementById('langLabel');
+    if (label) label.textContent = this.localeNames[this.current] || 'EN';
+    document.querySelectorAll('.lang-option').forEach(function(el) {
+      el.classList.toggle('active', el.dataset.lang === LANG.current);
+    });
+  }
+};
+
+function __(key, fallback) { return LANG.__(key, fallback); }
+
+function switchLang(locale) {
+  LANG.current = locale;
+  localStorage.setItem('ncm_lang', locale);
+  LANG.load().then(function() {
+    // Reload data to refresh any dynamic text
+    if (typeof loadFileList === 'function') loadFileList();
+    if (typeof loadOutputs === 'function') loadOutputs();
+  });
+  closeLangDropdown();
+}
+
+function toggleLangDropdown() {
+  document.getElementById('langDropdown').classList.toggle('show');
+}
+function closeLangDropdown() {
+  document.getElementById('langDropdown').classList.remove('show');
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.lang-dropdown')) closeLangDropdown();
+});
+
+// ============================================================
+// App State
+// ============================================================
 var BASE = '';
+var MODE = 0;
+var AUTH_TOKEN = localStorage.getItem('ncm_token');
+var CURRENT_USER = null;
 var allFiles = [], progressMap = {}, selected = new Set(), eventSource = null;
 var isDark = true;
-var dirPickerTarget = 'data';  // 'data' or 'output'
+var dirPickerTarget = 'data';
 var dirPickerCurrent = '';
+var decryptTimer = null;
+var currentFsPath = '/';  // Current file browser directory
+var fsItems = [];          // Current directory listing
+var renameTarget = '';     // Item being renamed
+var deleteTarget = '';     // Item being deleted
+var deleteRecursive = false;
 
-// ---- Theme ----
+// ============================================================
+// API Helper
+// ============================================================
+function api(path, options) {
+  options = options || {};
+  options.headers = options.headers || {};
+  if (MODE === 1 && AUTH_TOKEN) {
+    options.headers['Authorization'] = 'Bearer ' + AUTH_TOKEN;
+  }
+  return fetch(BASE + path, options);
+}
+
+// ============================================================
+// Auth
+// ============================================================
+function switchAuthTab(tab) {
+  document.getElementById('tabLogin').className = 'auth-tab' + (tab==='login'?' active':'');
+  document.getElementById('tabRegister').className = 'auth-tab' + (tab==='register'?' active':'');
+  document.getElementById('loginForm').className = 'auth-form' + (tab==='login'?' active':'');
+  document.getElementById('registerForm').className = 'auth-form' + (tab==='register'?' active':'');
+  hideAuthError('loginError');
+  hideAuthError('registerError');
+}
+function showAuthError(id, msg) {
+  var el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideAuthError(id) {
+  document.getElementById(id).style.display = 'none';
+}
+function doLogin() {
+  var user = document.getElementById('loginUser').value.trim();
+  var pass = document.getElementById('loginPass').value;
+  if (!user || !pass) { showAuthError('loginError', 'Fill in username and password'); return; }
+  hideAuthError('loginError');
+  fetch(BASE + '/api/login', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({username: user, password: pass})
+  }).then(function(r){ return r.json(); }).then(function(data) {
+    if (data.error) { showAuthError('loginError', data.error); return; }
+    AUTH_TOKEN = data.token;
+    CURRENT_USER = data.username;
+    localStorage.setItem('ncm_token', data.token);
+    showAppScreen();
+    initApp();
+  }).catch(function(){ showAuthError('loginError', 'Login failed'); });
+}
+function doRegister() {
+  var user = document.getElementById('regUser').value.trim();
+  var pass = document.getElementById('regPass').value;
+  if (!user || !pass) { showAuthError('registerError', 'Fill in username and password'); return; }
+  if (user.length < 3) { showAuthError('registerError', 'Username must be at least 3 characters'); return; }
+  if (pass.length < 4) { showAuthError('registerError', 'Password must be at least 4 characters'); return; }
+  hideAuthError('registerError');
+  fetch(BASE + '/api/register', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({username: user, password: pass})
+  }).then(function(r){ return r.json(); }).then(function(data) {
+    if (data.error) { showAuthError('registerError', data.error); return; }
+    showAuthError('registerError', t('register_success', 'Registration successful! Please login'));
+    document.getElementById('registerError').style.color = 'var(--green)';
+    setTimeout(function(){ switchAuthTab('login'); document.getElementById('loginUser').value = user; }, 1000);
+  }).catch(function(){ showAuthError('registerError', 'Registration failed'); });
+}
+function logout() {
+  if (MODE !== 1) return;
+  api('/api/logout', {method: 'POST'}).catch(function(){});
+  AUTH_TOKEN = null;
+  CURRENT_USER = null;
+  localStorage.removeItem('ncm_token');
+  showAuthScreen();
+}
+
+// ============================================================
+
+// ============================================================
+// renderAll - Re-render all UI text (called on init + language switch)
+// ============================================================
+function renderAll() {
+  // Update lang label
+  LANG.updateLangLabel();
+
+  // Auth screen
+  var loginTitle = document.getElementById('loginTitle');
+  if (loginTitle) loginTitle.textContent = __('login_title');
+  var tabLogin = document.getElementById('tabLogin');
+  if (tabLogin) tabLogin.textContent = __('login_tab');
+  var tabRegister = document.getElementById('tabRegister');
+  if (tabRegister) tabRegister.textContent = __('register_tab');
+
+  var lu = document.getElementById('loginUser');
+  if (lu) lu.placeholder = __('username');
+  var lp = document.getElementById('loginPass');
+  if (lp) lp.placeholder = __('password');
+  var loginBtn = document.querySelector('#loginForm .btn');
+  if (loginBtn) loginBtn.textContent = __('login_btn');
+
+  var ru = document.getElementById('regUser');
+  if (ru) ru.placeholder = __('username');
+  var rp = document.getElementById('regPass');
+  if (rp) rp.placeholder = __('password');
+  var regBtn = document.querySelector('#registerForm .btn');
+  if (regBtn) regBtn.textContent = __('register_btn');
+
+  // App title
+  document.title = __('app_title', 'NCM Decrypt');
+  var titleEl = document.getElementById('title');
+  if (titleEl) titleEl.textContent = __('app_title', 'NCM Decrypt');
+
+  // Upload area
+  var ut = document.getElementById('uploadBtnText');
+  if (ut) ut.textContent = __('upload_btn');
+  var uh = document.getElementById('uploadHint');
+  if (uh) uh.textContent = MODE === 1 ? __('upload_hint') : __('upload_hint_local');
+
+  // Toolbar buttons
+  var tb = document.querySelectorAll('.toolbar .btn');
+  if (tb.length >= 5) {
+    tb[0].innerHTML = '&#x21bb; ' + __('refresh', 'Refresh');
+    tb[1].innerHTML = '&#x25b6; ' + __('decrypt_selected', 'Decrypt selected');
+    tb[2].innerHTML = '&#x1f4c1; ' + __('new_folder', 'New Folder');
+    tb[3].innerHTML = '&#x2611; ' + __('select_all', 'Select all');
+    tb[4].innerHTML = '&#x2610; ' + __('deselect_all', 'Deselect');
+  }
+
+  // Stats
+  var sfl = document.getElementById('statFilesLabel');
+  if (sfl) sfl.textContent = __('file_count', 'Files');
+  var sdl = document.getElementById('statDecryptedLabel');
+  if (sdl) sdl.textContent = __('decrypted_count', 'Decrypted');
+  var supl = document.getElementById('statDupLabel');
+  if (supl) supl.textContent = __('duplicate_count', 'Duplicates');
+
+  // File browser panel
+  var bt = document.getElementById('browserTitle');
+  if (bt) bt.textContent = __('name', 'Name');
+  var nh = document.getElementById('nameHeader');
+  if (nh) nh.textContent = __('name', 'Name');
+  var sh = document.getElementById('sizeHeader');
+  if (sh) sh.textContent = __('size', 'Size');
+  var ah = document.getElementById('actionHeader');
+  if (ah) ah.textContent = __('download', 'Download');
+
+  var nft = document.getElementById('noFilesText');
+  if (nft) nft.textContent = __('no_files', 'No .ncm files found');
+  var uot = document.getElementById('uploadOrCopyText');
+  if (uot) uot.textContent = __('upload_or_copy', 'Upload .ncm files or copy them to your data directory');
+
+  // Progress & Output
+  var pt = document.getElementById('progressTitle');
+  if (pt) pt.textContent = __('processing', 'Progress');
+  var ot = document.getElementById('outputTitle');
+  if (ot) ot.textContent = __('decrypted_files', 'Decrypted files');
+
+  // Settings
+  var ss = document.getElementById('settingsSummary');
+  if (ss) ss.textContent = __('settings', 'Settings');
+  var ddl = document.getElementById('dataDirLabel');
+  if (ddl) ddl.textContent = __('data_dir', 'Data directory');
+  var odl = document.getElementById('outDirLabel');
+  if (odl) odl.textContent = __('output_dir', 'Output directory');
+  var acl = document.getElementById('autoCleanLabel');
+  if (acl) acl.textContent = __('auto_clean', 'Auto-delete source after decrypt');
+
+  // Modals
+  var mkt = document.getElementById('mkdirTitle');
+  if (mkt) mkt.textContent = __('new_folder', 'New Folder');
+  var mki = document.getElementById('mkdirInput');
+  if (mki) mki.placeholder = __('folder_name', 'Folder name');
+  var rnt = document.getElementById('renameTitle');
+  if (rnt) rnt.textContent = __('rename', 'Rename');
+  var rni = document.getElementById('renameInput');
+  if (rni) rni.placeholder = __('rename_to', 'Rename to');
+  var dlt = document.getElementById('deleteTitle');
+  if (dlt) dlt.textContent = __('confirm_delete', 'Confirm Delete');
+  var dlm = document.getElementById('deleteMsg');
+  if (dlm) dlm.textContent = __('confirm_delete', 'Are you sure you want to delete this?');
+
+  // Modal cancel buttons
+  document.querySelectorAll('.modal-footer .btn-outline').forEach(function(b) {
+    b.textContent = __('cancel', 'Cancel');
+  });
+
+  // Dir picker
+  var dmt = document.getElementById('dirModalTitle');
+  if (dmt) dmt.textContent = __('data_dir', 'Select directory');
+
+  // Re-render dynamic content  
+  if (typeof renderFileList === 'function') renderFileList();
+  if (typeof loadOutputs === 'function') loadOutputs();
+}
+
+// App Init
+// ============================================================
+function init() {
+  // Load i18n first, then init app
+  LANG.init().then(function() {
+    // Check mode
+    fetch(BASE + '/api/info').then(function(r){ return r.json(); }).then(function(info) {
+      MODE = info.mode || 0;
+      if (MODE === 1) {
+        if (AUTH_TOKEN) {
+          api('/api/me').then(function(r){ return r.json(); }).then(function(data) {
+            if (data.authenticated) {
+              CURRENT_USER = data.username;
+              showAppScreen();
+              initApp();
+            } else {
+              AUTH_TOKEN = null;
+              localStorage.removeItem('ncm_token');
+              showAuthScreen();
+            }
+          }).catch(function(){ showAuthScreen(); });
+        } else {
+          showAuthScreen();
+        }
+      } else {
+        showAppScreen();
+        initApp();
+      }
+    }).catch(function(){
+      MODE = 0;
+      showAppScreen();
+      initApp();
+    });
+  });
+}
+
+function showAuthScreen() {
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('userBadge').style.display = 'none';
+}
+function showAppScreen() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+  if (CURRENT_USER) {
+    document.getElementById('userName').textContent = CURRENT_USER;
+    document.getElementById('userBadge').style.display = 'inline-flex';
+  } else {
+    document.getElementById('userBadge').style.display = 'none';
+  }
+  // Adapt UI for mode
+  if (MODE === 1) {
+    document.getElementById('configDataDir').style.display = 'none';
+    document.getElementById('configOutDir').style.display = 'none';
+  } else {
+    document.getElementById('configDataDir').style.display = 'flex';
+    document.getElementById('configOutDir').style.display = 'flex';
+  }
+  // Build language dropdown
+  buildLangDropdown();
+}
+function buildLangDropdown() {
+  var dd = document.getElementById('langDropdown');
+  if (dd.children.length > 0) return;
+  var langs = {'en':'English','zh-CN':'中文（简体）','zh-TW':'中文（繁體）','ko':'한국어','ja':'日本語'};
+  Object.keys(langs).forEach(function(l) {
+    var el = document.createElement('div');
+    el.className = 'lang-option' + (l === LANG.current ? ' active' : '');
+    el.dataset.lang = l;
+    el.textContent = langs[l];
+    el.onclick = function(){ switchLang(l); };
+    dd.appendChild(el);
+  });
+}
+function initApp() {
+  loadConfig();
+  loadFileList();
+  loadOutputs();
+}
+
+// ============================================================
+// Theme
+// ============================================================
 function toggleTheme(){
   isDark = !isDark;
   document.body.classList.toggle('light', !isDark);
@@ -244,189 +747,254 @@ function toggleTheme(){
   if(saved==='light'){ isDark=false; document.body.classList.add('light'); }
 })();
 
-// ---- Config ----
+// ============================================================
+// Config
+// ============================================================
 function loadConfig(){
-  fetch(BASE+'/api/config').then(function(r){return r.json()}).then(function(cfg){
-    document.getElementById('dataDirDisplay').textContent = cfg.data_dir;
-    document.getElementById('outDirDisplay').textContent = cfg.output_dir;
-    document.getElementById('emptyDir').textContent = cfg.data_dir;
-    document.getElementById('dataDir').textContent = cfg.data_dir;
-    document.getElementById('outDir').textContent = cfg.output_dir;
+  api('/api/config').then(function(r){ return r.json(); }).then(function(cfg){
+    if (cfg.data_dir) document.getElementById('dataDirDisplay').textContent = cfg.data_dir;
+    if (cfg.output_dir) document.getElementById('outDirDisplay').textContent = cfg.output_dir;
   }).catch(function(){});
 }
 
-// ---- Directory Picker ----
-function openDirPicker(target){
-  dirPickerTarget = target;
-  document.getElementById('dirModalTitle').textContent = target==='data' ? '选择数据目录' : '选择输出目录';
-  document.getElementById('dirModal').classList.add('active');
-  loadDirExplorer('');
+// ============================================================
+// File Browser
+// ============================================================
+function loadFileList(path) {
+  if (path !== undefined) { currentFsPath = path; }
+  var url = '/api/ls?path=' + encodeURIComponent(currentFsPath);
+  api(url).then(function(r){ return r.json(); }).then(function(data) {
+    if (data.error) { showToast(data.error); return; }
+    fsItems = data.items || [];
+    renderBreadcrumb(currentFsPath);
+    renderFileList();
+    // Also load NCM file list for stats/decrypt
+    loadNcmFileList();
+  }).catch(function(){ showToast('Failed to load files'); });
 }
-function closeDirPicker(){
-  document.getElementById('dirModal').classList.remove('active');
-}
-function loadDirExplorer(path){
-  var url = BASE+'/api/explorer';
-  if(path) url += '?path='+encodeURIComponent(path);
-  fetch(url).then(function(r){return r.json()}).then(function(data){
-    if(data.error){ showToast(data.error); return; }
-    dirPickerCurrent = data.current;
-    document.getElementById('dirPathInput').value = data.current;
-    renderDirList(data);
-  }).catch(function(){showToast('无法读取目录')});
-}
-function navigateTo(path){
-  if(!path) return;
-  loadDirExplorer(path);
-}
-function renderDirList(data){
-  var list = document.getElementById('dirList');
-  list.innerHTML = '';
-  // Parent directory
-  if(data.parent){
-    var parentItem = document.createElement('div');
-    parentItem.className = 'dir-item';
-    parentItem.innerHTML = '<span class="name" style="color:var(--text3)">.. (上级目录)</span><span class="arrow">&#x2191;</span>';
-    parentItem.onclick = function(){ loadDirExplorer(data.parent); };
-    list.appendChild(parentItem);
+
+function renderBreadcrumb(path) {
+  var bc = document.getElementById('breadcrumb');
+  if (path === '/' || path === '') {
+    bc.innerHTML = '<a href="#" onclick="loadFileList(\'/\');return false">/</a>';
+    return;
   }
-  for(var i=0;i<data.directories.length;i++){
-    var d = data.directories[i];
-    var item = document.createElement('div');
-    item.className = 'dir-item';
-    item.innerHTML = '<span class="name">&#x1f4c1; '+escHtml(d.name)+'</span><span class="arrow">&#x203a;</span>';
-    item.onclick = function(path){ return function(){ loadDirExplorer(path); }; }(d.path);
-    list.appendChild(item);
+  var parts = path.split('/').filter(Boolean);
+  var html = '<a href="#" onclick="loadFileList(\'/\');return false">/</a>';
+  var cum = '';
+  parts.forEach(function(p, i) {
+    cum += '/' + p;
+    if (i === parts.length - 1) {
+      html += '<span>›</span><span style="color:var(--text)">' + escHtml(p) + '</span>';
+    } else {
+      html += '<span>›</span><a href="#" onclick="loadFileList(\'' + cum + '\');return false">' + escHtml(p) + '</a>';
+    }
+  });
+  bc.innerHTML = html;
+}
+
+function renderFileList() {
+  var container = document.getElementById('fileGrid');
+  var header = document.getElementById('fileGridContainer');
+  var empty = document.getElementById('fileEmpty');
+  document.getElementById('currentPath').textContent = currentFsPath;
+
+  if (!fsItems || fsItems.length === 0) {
+    empty.style.display = 'block';
+    header.style.display = 'none';
+    return;
   }
-  // Shortcuts
-  var sc = document.getElementById('shortcutItems');
-  sc.innerHTML = '';
-  for(var i=0;i<data.shortcuts.length;i++){
-    var s = data.shortcuts[i];
-    var el = document.createElement('span');
-    el.className = 'shortcut-item';
-    el.textContent = s.label;
-    el.onclick = function(path){ return function(){ loadDirExplorer(path); }; }(s.path);
-    sc.appendChild(el);
+  empty.style.display = 'none';
+  header.style.display = 'block';
+  container.innerHTML = '';
+
+  // Sort: dirs first, then files
+  var items = fsItems.slice().sort(function(a, b) {
+    if (a.type !== b.type) return a.type === 'dir' ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  items.forEach(function(item) {
+    var row = document.createElement('div');
+    row.className = 'file-row';
+    if (item.type === 'dir') {
+      row.onclick = function() {
+        if (item.path) loadFileList(item.path);
+      };
+    }
+
+    var isNcm = item.ext === '.ncm';
+    var isAudio = item.ext === '.mp3' || item.ext === '.flac' || item.ext === '.m4a' || item.ext === '.wav' || item.ext === '.ogg' || item.ext === '.aiff' || item.ext === '.ape';
+    var icon = item.type === 'dir' ? (item.name === 'data' || item.name === 'output' ? '&#x1f4c1;' : '&#x1f4c2;') : (isNcm ? '&#x1f3b5;' : (isAudio ? '&#x1f50a;' : '&#x1f4c4;'));
+    var iconClass = item.type === 'dir' ? 'file-icon-dir' : (isNcm ? 'file-icon-ncm' : 'file-icon-file');
+
+    // Icon cell
+    var iconCell = document.createElement('div');
+    iconCell.innerHTML = '<span class="file-icon ' + iconClass + '">' + icon + '</span>';
+
+    // Name cell (with checkbox for .ncm)
+    var nameCell = document.createElement('div');
+    if (isNcm) {
+      var checked = selected.has(item.name) ? 'checked' : '';
+      nameCell.innerHTML = '<input type="checkbox" ' + checked + ' onclick="event.stopPropagation();toggleNcmSel(\'' + escJs(item.name) + '\',this.checked)" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0"> <span class="file-name-text">' + escHtml(item.name) + '</span>';
+    } else if (item.type === 'dir') {
+      nameCell.innerHTML = '<span class="file-name-text" style="cursor:pointer">' + escHtml(item.name) + '</span>';
+    } else {
+      nameCell.innerHTML = '<span class="file-name-text">' + escHtml(item.name) + '</span>';
+    }
+
+    // Size cell
+    var sizeCell = document.createElement('div');
+    sizeCell.className = 'file-size-text';
+    sizeCell.textContent = item.type === 'dir' ? '-' : formatSize(item.size || 0);
+
+    // Actions cell
+    var actionCell = document.createElement('div');
+    actionCell.className = 'file-actions';
+    actionCell.style.cssText = 'display:flex;gap:4px;justify-content:flex-end';
+    actionCell.onclick = function(e) { e.stopPropagation(); };
+
+    // Download button (audio files)
+    if (isAudio || isNcm) {
+      var dlBtn = makeBtn('&#x2b07;', 'Download', function() {
+        downloadFile(item.path);
+      });
+      actionCell.appendChild(dlBtn);
+    }
+
+    // Rename button
+    var mvBtn = makeBtn('&#x270f;', 'Rename', function() {
+      showRenameModal(item.path);
+    });
+    actionCell.appendChild(mvBtn);
+
+    // Delete button
+    var delBtn = makeBtn('&#x1f5d1;', 'Delete', function() {
+      showDeleteModal(item.path, item.type === 'dir');
+    });
+    actionCell.appendChild(delBtn);
+
+    row.appendChild(iconCell);
+    row.appendChild(nameCell);
+    row.appendChild(sizeCell);
+    row.appendChild(actionCell);
+    container.appendChild(row);
+  });
+}
+
+function makeBtn(html, title, cb) {
+  var btn = document.createElement('button');
+  btn.className = 'btn-icon';
+  btn.style.cssText = 'padding:4px 6px;font-size:12px';
+  btn.innerHTML = html;
+  btn.title = title;
+  btn.onclick = function(e) { e.stopPropagation(); cb(); };
+  return btn;
+}
+
+function downloadFile(path) {
+  var url = BASE + '/api/file/download?file=' + encodeURIComponent(path);
+  if (MODE === 1 && AUTH_TOKEN) {
+    // For authenticated downloads, we need to pass the token
+    // Use a temporary link with the token in a cookie or as query param
+    // Simplest: open in new tab with token in URL
+    var a = document.createElement('a');
+    a.href = url + '&token=' + encodeURIComponent(AUTH_TOKEN);
+    a.download = path.split('/').pop();
+    a.click();
+  } else {
+    window.open(url, '_blank');
   }
 }
-function confirmDir(){
-  if(!dirPickerCurrent) return;
-  var body = {};
-  if(dirPickerTarget==='data') body.data_dir = dirPickerCurrent;
-  else body.output_dir = dirPickerCurrent;
-  fetch(BASE+'/api/settings',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  }).then(function(r){return r.json()}).then(function(cfg){
-    closeDirPicker();
-    loadConfig();
-    loadFiles();
-    showToast('目录已更新');
-  }).catch(function(){showToast('设置失败')});
+
+// Fix for downloads with auth - add token support on backend
+// The frontend can also use fetch + blob
+function downloadFileFetch(path) {
+  api('/api/file/download?file=' + encodeURIComponent(path))
+    .then(function(r) {
+      if (!r.ok) throw new Error('Download failed');
+      return r.blob();
+    })
+    .then(function(blob) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = path.split('/').pop();
+      a.click();
+      URL.revokeObjectURL(a.href);
+    })
+    .catch(function(e) { showToast('Download failed'); });
 }
 
-// ---- File picker (mobile-friendly) ----
-function pickFiles(){
-  document.getElementById('fileInput').click();
-}
-document.getElementById('fileInput').addEventListener('change', function(e){
-  var files = Array.from(e.target.files).filter(function(f){ return f.name.toLowerCase().indexOf('.ncm')>0; });
-  if(files.length===0){ showToast('只支持 .ncm 文件'); return; }
-  uploadFiles(files);
-  e.target.value = '';
-});
+// ============================================================
+// NCM File List (for decrypt operations)
+// ============================================================
+var ncmFiles = [];
 
-document.addEventListener('dragover', function(e){ e.preventDefault(); });
-document.addEventListener('drop', function(e){
-  e.preventDefault();
-  var files = Array.from(e.dataTransfer.files).filter(function(f){ return f.name.toLowerCase().indexOf('.ncm')>0; });
-  if(files.length===0){ showToast('只支持 .ncm 文件'); return; }
-  uploadFiles(files);
-});
-
-function uploadFiles(files){
-  var formData = new FormData();
-  for(var i=0;i<files.length;i++) formData.append("files", files[i]);
-  showToast("上传中 ("+files.length+" 个)...");
-  fetch(BASE+"/api/upload",{method:"POST",body:formData})
-  .then(function(r){return r.json()}).then(function(data){
-    if(data.files&&data.files.length>0){
-      for(var i=0;i<data.files.length;i++) selected.add(data.files[i].name);
-      showToast("已添加 "+data.files.length+" 个文件");
-      refreshAll();
-    } else { showToast("上传失败"); }
-  }).catch(function(){showToast("上传失败")});
+function loadNcmFileList() {
+  api('/api/list').then(function(r){ return r.json(); }).then(function(data) {
+    ncmFiles = data || [];
+    updateStats();
+  }).catch(function(){});
 }
 
-function loadFiles(){
-  fetch(BASE+'/api/list').then(function(r){return r.json()}).then(function(data){
-    allFiles = data;
-    render(); checkDedup();
-  }).catch(function(){showToast('加载文件列表失败')});
-}
-
-function render(){
-  var container = document.getElementById('fileRows');
-  var empty = document.getElementById('emptyState');
-  var fileList = document.getElementById('fileList');
-  var btnDecrypt = document.getElementById('btnDecrypt');
-  var btnClean = document.getElementById('btnClean');
-  document.getElementById('statTotal').textContent = allFiles.length;
+function updateStats() {
+  var total = ncmFiles.length;
   var done = 0, hashes = {}, dups = 0;
-  for(var i=0;i<allFiles.length;i++){ var f=allFiles[i]; if(f.decrypted) done++; if(hashes[f.hash]) dups++; else hashes[f.hash]=true; }
+  ncmFiles.forEach(function(f) { if (f.decrypted) done++; if (hashes[f.hash]) dups++; else hashes[f.hash] = true; });
+  document.getElementById('statTotal').textContent = total;
   document.getElementById('statDone').textContent = done;
   document.getElementById('statDup').textContent = dups;
-  if(allFiles.length===0){
-    empty.style.display='block'; fileList.style.display='none'; btnDecrypt.disabled=true; btnClean.disabled=true; return;
-  }
-  empty.style.display='none'; fileList.style.display='block'; container.innerHTML='';
-  var hasDecrypted=false;
-  for(var i=0;i<allFiles.length;i++){
-    var f=allFiles[i]; if(f.decrypted) hasDecrypted=true;
-    var checked = selected.has(f.name)?'checked':'';
-    var row = document.createElement('div'); row.className='file-row';
-    row.innerHTML='<div class="cb"><input type="checkbox" '+checked+' onchange="toggleSel(\''+escJs(f.name)+'\',this.checked)"></div><div class="file-name" title="'+escHtml(f.name)+'">'+escHtml(f.name)+'</div><div class="file-size">'+formatSize(f.size)+'</div><div class="file-status">'+(f.decrypted?'<span class="badge badge-ok">已解密</span>':'<span class="badge badge-wait">待处理</span>')+'</div>';
-    container.appendChild(row);
-  }
-  btnDecrypt.disabled = selected.size===0;
-  btnClean.disabled = !hasDecrypted;
+  // Enable/disable decrypt button
+  document.getElementById('btnDecrypt').disabled = selected.size === 0;
 }
 
-function toggleSel(name,checked){ if(checked) selected.add(name); else selected.delete(name); document.getElementById('btnDecrypt').disabled = selected.size===0; }
-function selectAll(checked){ for(var i=0;i<allFiles.length;i++){ if(checked) selected.add(allFiles[i].name); else selected.delete(allFiles[i].name); } render(); }
+var ncmSelected = new Set();
+function toggleNcmSel(name, checked) {
+  if (checked) { ncmSelected.add(name); selected.add(name); }
+  else { ncmSelected.delete(name); selected.delete(name); }
+  document.getElementById('btnDecrypt').disabled = selected.size === 0;
+}
+function selectAll() {
+  ncmFiles.forEach(function(f) { ncmSelected.add(f.name); selected.add(f.name); });
+  renderFileList();
+  document.getElementById('btnDecrypt').disabled = selected.size === 0;
+}
+function deselectAll() {
+  ncmSelected.clear(); selected.clear();
+  renderFileList();
+  document.getElementById('btnDecrypt').disabled = true;
+}
 
+// ============================================================
+// Decrypt
+// ============================================================
 function startDecrypt(){
   var sel = Array.from(selected);
-  var hasDecrypted = sel.some(function(n){ var f=allFiles.find(function(x){return x.name===n;}); return f&&f.decrypted; });
-  if(hasDecrypted && !confirm("已选文件中包含已解密过的文件，是否重新解密？\n\n点「确定」重新解密全部\n点「取消」只解密未处理文件")){
-    sel = sel.filter(function(n){ var f=allFiles.find(function(x){return x.name===n;}); return !f||!f.decrypted; });
-  }
-  var files = sel;
-  if(files.length===0) return;
+  if (sel.length === 0) return;
   var btn = document.getElementById('btnDecrypt');
-  btn.disabled=true; btn.textContent='解密中...';
+  btn.disabled=true; btn.innerHTML = '&#x23f3; Decrypting...';
   document.getElementById('progressSection').style.display='block';
   var progList = document.getElementById('progressList');
   progList.innerHTML='';
-  for(var i=0;i<files.length;i++){
-    var name=files[i];
-    var div=document.createElement('div'); div.className='file-row'; div.style.gridTemplateColumns='1fr'; div.id='prog-'+escId(name);
-    div.innerHTML='<div style="display:flex;justify-content:space-between;padding:2px 0"><span style="font-size:13px">'+escHtml(name)+'</span><span style="font-size:12px;color:var(--text3)" id="ps-'+escId(name)+'">等待中</span></div><div class="progress-cell"><div class="progress-bar"><div class="progress-fill" id="pb-'+escId(name)+'"></div></div></div>';
+  sel.forEach(function(name) {
+    var div=document.createElement('div'); div.className='progress-item'; div.id='prog-'+escId(name);
+    div.innerHTML='<div class="progress-header"><span>'+escHtml(name)+'</span><span style="font-size:12px;color:var(--text3)" id="ps-'+escId(name)+'">Waiting</span></div><div class="progress-bar"><div class="progress-fill" id="pb-'+escId(name)+'"></div></div>';
     progList.appendChild(div);
     progressMap[name]=0;
-  }
+  });
   if(eventSource) eventSource.close();
   eventSource = new EventSource(BASE+'/api/events');
   eventSource.addEventListener('decrypting', onSSE);
   eventSource.addEventListener('complete', onSSE);
   eventSource.addEventListener('error', onSSE);
-  fetch(BASE+'/api/decrypt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:files})}).then(function(r){return r.json()}).then(function(data){console.log('started:',data);}).catch(function(e){ btn.disabled=false; btn.textContent='▶ 解密选中'; showToast('启动失败') });
-  if(decryptTimer) clearInterval(decryptTimer); decryptTimer = setInterval(function(){
-    if(progressMap['_done_']===files.length){
+  api('/api/decrypt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:sel})})
+    .then(function(r){return r.json()}).then(function(data){console.log('started:',data);})
+    .catch(function(e){ btn.disabled=false; btn.innerHTML='&#x25b6; Decrypt selected'; showToast('Failed to start decryption'); });
+  if(decryptTimer) clearInterval(decryptTimer);
+  decryptTimer = setInterval(function(){
+    if(progressMap['_done_']===sel.length){
       clearInterval(decryptTimer); decryptTimer = null; if(eventSource) eventSource.close();
-      btn.disabled=false; btn.textContent='▶ 解密选中'; refreshAll();
+      btn.disabled=false; btn.innerHTML='&#x25b6; Decrypt selected'; refreshAll();
     }
   },500);
 }
@@ -434,90 +1002,157 @@ function startDecrypt(){
 function onSSE(e){
   try{
     var data=JSON.parse(e.data); if(!data.file) return;
-    var bar=document.getElementById('pb-'+escId(data.file)); var st=document.getElementById('ps-'+escId(data.file));
+    var bar=document.getElementById('pb-'+escId(data.file));
+    var st=document.getElementById('ps-'+escId(data.file));
     if(!bar) return;
     var pct=Math.min(Math.max(data.progress||0,0),100); bar.style.width=pct+'%';
     if(st){
-      if(data.state==='complete'){ st.textContent='完成 ✓'; if(!progressMap['_done_']) progressMap['_done_']=0; progressMap['_done_']++;
-        if(document.getElementById('autoClean').checked) fetch(BASE+'/api/clean',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:[data.file]})}).catch(function(){}); }
-      else if(data.state==='error'){ st.textContent='✗ '+(data.error||'失败'); if(!progressMap['_done_']) progressMap['_done_']=0; progressMap['_done_']++; }
+      if(data.state==='complete'){ st.textContent='&#x2713; Complete'; if(!progressMap['_done_']) progressMap['_done_']=0; progressMap['_done_']++;
+        if(document.getElementById('autoClean').checked) api('/api/clean',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:[data.file]})}).catch(function(){}); }
+      else if(data.state==='error'){ st.textContent='&#x2717; '+(data.error||'Error'); if(!progressMap['_done_']) progressMap['_done_']=0; progressMap['_done_']++; }
       else st.textContent=Math.round(pct)+'%';
     }
   }catch(err){}
 }
 
-function cleanFiles(){
-  if(!confirm('确定删除已解密对应的 .ncm 源文件？此操作不可恢复！')) return;
-  var toClean=[]; for(var i=0;i<allFiles.length;i++){ if(allFiles[i].decrypted) toClean.push(allFiles[i].name); }
-  if(toClean.length===0) return;
-  fetch(BASE+'/api/clean',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:toClean})})
-  .then(function(r){return r.json()}).then(function(data){ showToast('已删除 '+data.deleted+' 个文件'+(data.failed>0?'，'+data.failed+' 个失败':'')); refreshAll(); })
-  .catch(function(){showToast('删除失败')});
+// ============================================================
+// File Manager Operations
+// ============================================================
+function showMkdirModal() {
+  document.getElementById('mkdirInput').value = '';
+  document.getElementById('mkdirModal').classList.add('active');
+  setTimeout(function(){ document.getElementById('mkdirInput').focus(); }, 100);
+}
+function doMkdir() {
+  var name = document.getElementById('mkdirInput').value.trim();
+  if (!name) return;
+  var path = (currentFsPath === '/' ? '' : currentFsPath) + '/' + name;
+  api('/api/mkdir', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({path: path})
+  }).then(function(r){ return r.json(); }).then(function(data) {
+    if (data.error) { showToast(data.error); return; }
+    closeModal('mkdirModal');
+    showToast('Folder created');
+    loadFileList();
+  }).catch(function(){ showToast('Failed to create folder'); });
 }
 
-function dedupFiles(){
-  var names = allFiles.map(function(f){return f.name;});
-  fetch(BASE+'/api/dedup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:names})})
+var renamePath = '';
+function showRenameModal(path) {
+  renamePath = path;
+  var name = path.split('/').pop();
+  document.getElementById('renameInput').value = name;
+  document.getElementById('renameModal').classList.add('active');
+  setTimeout(function(){ document.getElementById('renameInput').focus(); document.getElementById('renameInput').select(); }, 100);
+}
+function doRename() {
+  var newName = document.getElementById('renameInput').value.trim();
+  if (!newName || !renamePath) return;
+  var parts = renamePath.split('/');
+  parts[parts.length - 1] = newName;
+  var newPath = parts.join('/');
+  api('/api/mv', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({from: renamePath, to: newPath})
+  }).then(function(r){ return r.json(); }).then(function(data) {
+    if (data.error) { showToast(data.error); return; }
+    closeModal('renameModal');
+    showToast('Renamed successfully');
+    renamePath = '';
+    loadFileList();
+    refreshAll();
+  }).catch(function(){ showToast('Rename failed'); });
+}
+
+var deletePath = '', deleteIsDir = false;
+function showDeleteModal(path, isDir) {
+  deletePath = path;
+  deleteIsDir = isDir;
+  document.getElementById('deleteMsg').textContent = 'Delete "' + path.split('/').pop() + '"?';
+  document.getElementById('deleteModal').classList.add('active');
+  document.getElementById('deleteConfirmBtn').textContent = 'Delete';
+}
+function doDelete() {
+  if (!deletePath) return;
+  api('/api/rm', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({path: deletePath, recursive: deleteIsDir})
+  }).then(function(r){ return r.json(); }).then(function(data) {
+    if (data.error) { showToast(data.error); return; }
+    closeModal('deleteModal');
+    showToast('Deleted');
+    deletePath = '';
+    loadFileList();
+    refreshAll();
+  }).catch(function(){ showToast('Delete failed'); });
+}
+
+// ============================================================
+// File Upload
+// ============================================================
+function pickFiles(){
+  document.getElementById('fileInput').click();
+}
+document.getElementById('fileInput').addEventListener('change', function(e){
+  var files = Array.from(e.target.files).filter(function(f){ return f.name.toLowerCase().indexOf('.ncm')>0; });
+  if(files.length===0){ showToast('Only .ncm files supported'); return; }
+  uploadFiles(files);
+  e.target.value = '';
+});
+document.addEventListener('dragover', function(e){ e.preventDefault(); });
+document.addEventListener('drop', function(e){
+  e.preventDefault();
+  var files = Array.from(e.dataTransfer.files).filter(function(f){ return f.name.toLowerCase().indexOf('.ncm')>0; });
+  if(files.length===0){ showToast('Only .ncm files supported'); return; }
+  uploadFiles(files);
+});
+
+function uploadFiles(files){
+  var formData = new FormData();
+  for(var i=0;i<files.length;i++) formData.append("files", files[i]);
+  showToast("Uploading ("+files.length+" files)...");
+  api("/api/upload",{method:"POST",body:formData})
   .then(function(r){return r.json()}).then(function(data){
-    var dups=data.duplicates||[];
-    if(dups.length===0){ showToast('没有发现重复文件'); return; }
-    for(var i=0;i<dups.length;i++) selected.delete(dups[i]);
-    if(confirm('发现 '+dups.length+' 个重复文件，删除它们吗？')){
-      fetch(BASE+'/api/clean',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:dups})})
-      .then(function(r){return r.json()}).then(function(d){ showToast('已删除 '+d.deleted+' 个重复文件'); refreshAll(); });
-    } else showToast('检测到 '+dups.length+' 个重复文件');
-  }).catch(function(){showToast('去重失败')});
+    if(data.files&&data.files.length>0){
+      for(var i=0;i<data.files.length;i++) selected.add(data.files[i].name);
+      showToast("Added "+data.files.length+" files");
+      refreshAll();
+    } else { showToast("Upload failed"); }
+  }).catch(function(){showToast("Upload failed")});
+}
+function showUploadArea() {
+  document.getElementById('fileInput').click();
 }
 
-function refreshAll(){ loadFiles(); loadOutputs(); }
+// ============================================================
+// Output Listing
+// ============================================================
 function loadOutputs(){
-  fetch(BASE+'/api/outputs').then(function(r){return r.json()}).then(function(files){
+  api('/api/outputs').then(function(r){return r.json()}).then(function(files){
     var sec=document.getElementById('outputSection'), lst=document.getElementById('outputList');
     if(!files||files.length===0){ sec.style.display='none'; return; }
     sec.style.display='block';
-    var html='<div class="file-list">';
-    for(var i=0;i<files.length;i++){ var f=files[i]; html+='<div class="output-item"><a href="'+BASE+'/api/download?file='+encodeURIComponent(f.name)+'" download>'+escHtml(f.name)+'</a><span style="color:var(--text3);font-size:13px">'+formatSize(f.size)+'</span></div>'; }
-    html+='</div>'; lst.innerHTML=html;
+    var html='';
+    files.forEach(function(f) {
+      html+='<div class="output-item"><a href="'+BASE+'/api/download?file='+encodeURIComponent(f.name)+'" download>'+escHtml(f.name)+'</a><div style="display:flex;align-items:center;gap:8px"><span style="color:var(--text3);font-size:13px">'+formatSize(f.size)+'</span><button class="btn-icon" onclick="downloadFile(\'output/'+encodeURIComponent(f.name)+'\')" title="Download">&#x2b07;</button></div></div>';
+    });
+    lst.innerHTML=html;
   }).catch(function(){});
 }
 
+// ============================================================
+// Helpers
+// ============================================================
 function escHtml(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 function escJs(s){ return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n'); }
 function escId(s){ return (s||'').replace(/[^a-zA-Z0-9_-]/g,'_'); }
-function formatSize(n){ if(n<1024) return n+' B'; if(n<1048576) return (n/1024).toFixed(1)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
-// ---- Cross-directory dedup dialog ----
-var dedupQueue = [];
-function checkDedup(){
-  dedupQueue = allFiles.filter(function(f){ return f.existing_source && f.existing_source !== ""; });
-  if(dedupQueue.length > 0) showNextDedup();
-}
-function showNextDedup(){
-  if(dedupQueue.length === 0) return;
-  var f = dedupQueue[0];
-  document.getElementById("dedupMsg").textContent = "文件 " + f.name + " 已在其他目录解密过";
-  document.getElementById("dedupSource").textContent = "来源: " + f.existing_source;
-  document.getElementById("dedupModal").classList.add("active");
-}
-function closeDedup(){
-  document.getElementById("dedupModal").classList.remove("active");
-}
-function dedupAction(action){
-  var f = dedupQueue[0];
-  if(!f) return;
-  closeDedup();
-  fetch(BASE+"/api/resolve",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({action:action, hash:f.hash, name:f.name})
-  }).then(function(r){return r.json()}).then(function(data){
-    if(data.status==="ok"){
-      showToast(action==="skip"?"已跳过":(action==="copy"?"已复制":"已移动"));
-      dedupQueue.shift();
-      showNextDedup();
-      refreshAll();
-    } else showToast("失败: "+(data.error||"unknown"));
-  }).catch(function(){showToast("请求失败")});
-}
+function formatSize(n){ if(!n||n<1024) return n+' B'; if(n<1048576) return (n/1024).toFixed(1)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+function refreshAll(){ loadFileList(); loadOutputs(); }
 
 function showToast(msg){
   var el=document.getElementById('toastMsg');
@@ -526,9 +1161,62 @@ function showToast(msg){
   clearTimeout(el._timer); el._timer=setTimeout(function(){el.classList.remove('show')},2500);
 }
 
-loadConfig();
-loadFiles();
-loadOutputs();
+// ============================================================
+// Directory Picker (Mode 0 only)
+// ============================================================
+function openDirPicker(target){
+  dirPickerTarget = target;
+  document.getElementById('dirModalTitle').textContent = target==='data' ? 'Select data directory' : 'Select output directory';
+  document.getElementById('dirModal').classList.add('active');
+  loadDirExplorer('');
+}
+function closeDirPicker(){
+  document.getElementById('dirModal').classList.remove('active');
+}
+function loadDirExplorer(path){
+  var url = '/api/explorer';
+  if(path) url += '?path='+encodeURIComponent(path);
+  api(url).then(function(r){return r.json()}).then(function(data){
+    if(data.error){ showToast(data.error); return; }
+    dirPickerCurrent = data.current;
+    document.getElementById('dirPathInput').value = data.current;
+    renderDirList(data);
+  }).catch(function(){showToast('Cannot read directory')});
+}
+function navigateTo(path){ if(path) loadDirExplorer(path); }
+function renderDirList(data){
+  var list = document.getElementById('dirList'); list.innerHTML = '';
+  if(data.parent){
+    var pi = document.createElement('div'); pi.className = 'dir-item';
+    pi.innerHTML = '<span class="name" style="color:var(--text3)">.. (parent)</span><span class="arrow">&#x2191;</span>';
+    pi.onclick = function(){ loadDirExplorer(data.parent); }; list.appendChild(pi);
+  }
+  (data.directories||[]).forEach(function(d){
+    var item = document.createElement('div'); item.className = 'dir-item';
+    item.innerHTML = '<span class="name">&#x1f4c1; '+escHtml(d.name)+'</span><span class="arrow">&#x203a;</span>';
+    item.onclick = function(path){ return function(){ loadDirExplorer(path); }; }(d.path); list.appendChild(item);
+  });
+  document.getElementById('shortcutItems').innerHTML = '';
+  (data.shortcuts||[]).forEach(function(s){
+    var el = document.createElement('span'); el.className = 'shortcut-item';
+    el.textContent = s.label;
+    el.onclick = function(path){ return function(){ loadDirExplorer(path); }; }(s.path);
+    document.getElementById('shortcutItems').appendChild(el);
+  });
+}
+function confirmDir(){
+  if(!dirPickerCurrent) return;
+  var body = {};
+  if(dirPickerTarget==='data') body.data_dir = dirPickerCurrent;
+  else body.output_dir = dirPickerCurrent;
+  api('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+  .then(function(r){return r.json()}).then(function(cfg){
+    closeDirPicker(); loadConfig(); loadFileList(); showToast('Directory updated');
+  }).catch(function(){showToast('Settings failed')});
+}
+
+// Start
+init();
 </script>
 </body>
 </html>

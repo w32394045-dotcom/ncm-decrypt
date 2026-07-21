@@ -5,7 +5,7 @@
 <h1 align="center">🎵 NCM Decrypt</h1>
 
 <p align="center">
-  <em>Decrypt NetEase Cloud Music .ncm files — Web UI + CLI, cross-platform.</em>
+  <em>Decrypt NetEase Cloud Music .ncm files — Web UI, Local & Server modes, cross-platform.</em>
 </p>
 
 <p align="center">
@@ -22,14 +22,18 @@
 
 ---
 
-Decrypt `.ncm` files downloaded from NetEase Cloud Music into standard `mp3` / `flac` / `m4a` formats, with automatic metadata writing (title, artist, album, cover art).
+Decrypt `.ncm` files from NetEase Cloud Music into standard `mp3` / `flac` / `m4a` formats with automatic metadata. Supports **local mode** (single-user, drag & drop) and **server mode** (multi-user, login, auth).
 
 ## ✨ Features
 
+- **Local & Server modes** — Single-user desktop or multi-user server with login
 - **Web UI** — Open in browser, drag & drop to decrypt
+- **Multi-language UI** — English, 中文 (Simplified/Traditional), 한국어, 日本語
+- **User management** — Create & manage users in server mode
+- **Config persistence** — Settings survive restarts
 - **Batch parallel** — Multi-worker concurrent processing
-- **Auto detect** — mp3 / flac / m4a / wav / ogg / aiff / ape
-- **Metadata & cover** — ID3v2 (mp3), Vorbis Comment (flac), cover art
+- **Auto format detect** — mp3 / flac / m4a / wav / ogg / aiff / ape
+- **Metadata & cover art** — ID3v2 (mp3), Vorbis Comment (flac), cover art
 - **Skip cache** — Already decrypted files are skipped automatically
 - **Cross-platform** — Linux / macOS / Windows / Termux, amd64 + arm64
 
@@ -48,21 +52,21 @@ Download from [GitHub Releases](https://github.com/w32394045-dotcom/ncm-decrypt/
 
 | Platform | File |
 |----------|------|
-| Linux x86_64 | `ncm-decrypt-v1.0.0-linux-amd64` |
-| Linux ARM64 | `ncm-decrypt-v1.0.0-linux-arm64` |
-| macOS Intel | `ncm-decrypt-v1.0.0-darwin-amd64` |
-| macOS Apple Silicon | `ncm-decrypt-v1.0.0-darwin-arm64` |
-| Windows x86_64 | `ncm-decrypt-v1.0.0-windows-amd64.exe` |
-| Windows ARM64 | `ncm-decrypt-v1.0.0-windows-arm64.exe` |
-| Termux (Android) | `ncm-decrypt-v1.0.0-termux-arm64` |
+| Linux x86_64 | `ncm-decrypt-v2.0.0-linux-amd64` |
+| Linux ARM64 | `ncm-decrypt-v2.0.0-linux-arm64` |
+| macOS Intel | `ncm-decrypt-v2.0.0-darwin-amd64` |
+| macOS Apple Silicon | `ncm-decrypt-v2.0.0-darwin-arm64` |
+| Windows x86_64 | `ncm-decrypt-v2.0.0-windows-amd64.exe` |
+| Windows ARM64 | `ncm-decrypt-v2.0.0-windows-arm64.exe` |
+| Termux (Android) | `ncm-decrypt-v2.0.0-termux-arm64` |
 
 ```bash
 # Linux / macOS
-chmod +x ncm-decrypt-v1.0.0-linux-amd64
-./ncm-decrypt-v1.0.0-linux-amd64
+chmod +x ncm-decrypt-v2.0.0-linux-amd64
+./ncm-decrypt-v2.0.0-linux-amd64
 
 # Windows
-ncm-decrypt-v1.0.0-windows-amd64.exe
+ncm-decrypt-v2.0.0-windows-amd64.exe
 ```
 
 ### Option 3: Build from Source
@@ -78,10 +82,17 @@ go build -ldflags="-s -w" -o ncm-decrypt .
 
 Open **http://localhost:8080** in your browser after starting.
 
+### Run Modes
+
+| Mode | Command | Description |
+|------|---------|-------------|
+| **Local** (default) | `ncm-decrypt` | Single-user, no login required |
+| **Server** | `ncm-decrypt -mode server` | Multi-user with login, user management in UI |
+
 ### CLI Flags
 
 ```bash
-./ncm-decrypt -port 8080 -dir ./ncm_files -output ./output -workers 4
+ncm-decrypt -port 8080 -dir ./ncm_files -output ./output -workers 4 -mode local
 ```
 
 | Flag | Default | Description |
@@ -91,6 +102,7 @@ Open **http://localhost:8080** in your browser after starting.
 | `-dir` | `.` | NCM file directory |
 | `-output` | `./output` | Output directory |
 | `-workers` | `3` | Concurrent workers |
+| `-mode` | `local` | Run mode: `local` or `server` |
 
 ### Mobile
 

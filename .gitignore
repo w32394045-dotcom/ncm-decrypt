@@ -1,0 +1,6 @@
+ncm-decrypt
+ncm-decrypt.exe
+output/
+release/
+*.zip
+*.tar.gz

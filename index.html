@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>NCM Decrypt</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f0f13;--surface:#18181b;--surface2:#1f1f23;--text:#e4e4e7;--text2:#a1a1aa;--text3:#71717a;--text4:#52525b;--border:#27272a;--accent:#7c3aed;--accent2:#6d28d9;--btn-disabled:#3f3f46;--btn-disabled-text:#71717a;--red:#dc2626;--red-hover:#b91c1c;--green:#16a34a;--green-hover:#15803d;--prog-bg:#27272a;--badge-ok-bg:#052e16;--badge-ok:#4ade80;--badge-wait-bg:#1c1917;--badge-run-bg:#1e1b4b;--badge-run:#818cf8;--badge-err-bg:#450a0a;--badge-err:#f87171;--toast-bg:#18181b;--toast-border:#27272a;--toast-shadow:0 8px 32px rgba(0,0,0,.4);--overlay:rgba(0,0,0,.6)}
+.light{--bg:#f5f5f5;--surface:#fff;--surface2:#f0f0f0;--text:#1a1a1a;--text2:#525252;--text3:#8a8a8a;--text4:#a3a3a3;--border:#d4d4d4;--btn-disabled:#e5e5e5;--btn-disabled-text:#a3a3a3;--prog-bg:#e5e5e5;--badge-ok-bg:#dcfce7;--badge-ok:#16a34a;--badge-wait-bg:#f5f5f5;--badge-run-bg:#ede9fe;--badge-run:#6d28d9;--badge-err-bg:#fde8e8;--badge-err:#dc2626;--toast-bg:#fff;--toast-border:#d4d4d4;--toast-shadow:0 8px 32px rgba(0,0,0,.1);--overlay:rgba(0,0,0,.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent}
+main{max-width:860px;margin:0 auto;padding:24px 16px 60px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
+h1{font-size:24px;font-weight:700;background:linear-gradient(135deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.theme-btn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:18px;cursor:pointer;padding:6px 10px;line-height:1;transition:all .2s}
+.theme-btn:active{color:var(--text);border-color:var(--accent)}
+.toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.btn{padding:10px 18px;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all .1s;-webkit-user-select:none;user-select:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:active{background:var(--accent2)}
+.btn-primary:disabled{background:var(--btn-disabled);color:var(--btn-disabled-text);cursor:not-allowed}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:active{background:var(--red-hover)}
+.btn-danger:disabled{background:var(--btn-disabled);color:var(--btn-disabled-text);cursor:not-allowed}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:active{background:var(--green-hover)}
+.btn-upload{background:var(--accent);color:#fff;padding:12px 24px;font-size:15px;display:inline-flex;align-items:center;gap:6px}
+.btn-upload:active{background:var(--accent2)}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-outline:active{background:var(--surface2);color:var(--text)}
+.stats{display:flex;gap:16px;margin-bottom:12px;font-size:13px;color:var(--text3);flex-wrap:wrap}
+.stats span strong{color:var(--text)}
+.upload-area{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:12px 16px;background:var(--surface);border:2px dashed var(--border);border-radius:10px;flex-wrap:wrap;justify-content:center}
+.upload-area-text{font-size:13px;color:var(--text3)}
+.file-list{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.file-header{display:grid;grid-template-columns:32px 1fr 90px 70px;padding:10px 14px;background:var(--surface2);font-size:12px;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border)}
+.file-row{display:grid;grid-template-columns:32px 1fr 90px 70px;padding:8px 14px;border-bottom:1px solid var(--border);font-size:14px;align-items:center;transition:background .15s}
+.file-row:active{background:var(--surface2)}
+.file-row:last-child{border-bottom:none}
+.file-row .cb{justify-self:center}
+.file-row .cb input{width:18px;height:18px;cursor:pointer;accent-color:var(--accent)}
+.file-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 4px;color:var(--text)}
+.file-size{color:var(--text3);font-size:13px;text-align:right}
+.file-status{text-align:center;font-size:13px}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500}
+.badge-ok{background:var(--badge-ok-bg);color:var(--badge-ok)}
+.badge-wait{background:var(--badge-wait-bg);color:var(--badge-wait)}
+.badge-run{background:var(--badge-run-bg);color:var(--badge-run)}
+.badge-err{background:var(--badge-err-bg);color:var(--badge-err)}
+.progress-cell{padding:4px 14px}
+.progress-bar{height:4px;background:var(--prog-bg);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--prog-fill);border-radius:2px;transition:width .3s ease;width:0%;background:linear-gradient(90deg,#7c3aed,#6366f1)}
+.empty-state{text-align:center;padding:40px 24px;color:var(--text4)}
+.empty-state .icon{font-size:48px;margin-bottom:8px}
+.empty-state p{margin-top:6px;font-size:14px}
+.section-title{font-size:13px;font-weight:600;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--toast-bg);border:1px solid var(--toast-border);border-radius:10px;padding:12px 20px;font-size:14px;z-index:10000;display:none;max-width:360px;width:90%;box-shadow:var(--toast-shadow);text-align:center}
+.toast.show{display:block;animation:fadeIn .25s}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* ---- Settings rows ---- */
+.config-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.config-row label{font-size:14px;color:var(--text2);min-width:80px}
+.config-path{font-size:13px;color:var(--accent);cursor:pointer;padding:4px 8px;border-radius:4px;border:1px solid var(--border);background:var(--surface);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:border-color .2s}
+.config-path:active{border-color:var(--accent)}
+.config-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
+
+/* ---- Directory picker modal ---- */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--overlay);z-index:9999;justify-content:center;align-items:center;padding:16px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:100%;max-width:480px;max-height:80vh;display:flex;flex-direction:column;box-shadow:var(--toast-shadow)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
+.modal-header h2{font-size:16px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;padding:0 4px}
+.modal-body{flex:1;overflow-y:auto;padding:0}
+.modal-path{display:flex;align-items:center;gap:6px;padding:10px 16px;border-bottom:1px solid var(--border)}
+.modal-path input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px 10px;font-size:13px;font-family:monospace}
+.modal-path button{padding:8px 12px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-size:13px;cursor:pointer}
+.dir-list{padding:4px 0}
+.dir-item{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s}
+.dir-item:active{background:var(--surface2)}
+.dir-item:last-child{border-bottom:none}
+.dir-item .name{font-size:14px;color:var(--text)}
+.dir-item .arrow{color:var(--text3);font-size:16px}
+.shortcuts{padding:8px 16px 12px;border-top:1px solid var(--border)}
+.shortcuts-title{font-size:12px;color:var(--text4);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.shortcut-item{display:inline-block;padding:6px 12px;margin:3px;border-radius:6px;border:1px solid var(--border);font-size:13px;color:var(--text2);cursor:pointer;transition:all .1s}
+.shortcut-item:active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--border)}
+.modal-footer .btn{padding:8px 20px;font-size:14px}
+
+.output-item{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-size:14px;border-bottom:1px solid var(--border)}
+.output-item:last-child{border-bottom:none}
+.output-item a{color:var(--accent);text-decoration:none;font-weight:500;padding:4px 0}
+.output-item a:active{text-decoration:underline}
+
+@media(max-width:600px){
+main{padding:16px 10px 40px}
+h1{font-size:20px}
+.toolbar{gap:6px}
+.btn{padding:10px 14px;font-size:13px}
+.btn-upload{width:100%;justify-content:center}
+.upload-area{flex-direction:column;padding:10px;gap:8px}
+.stats{font-size:12px;gap:10px}
+.file-header,.file-row{grid-template-columns:28px 1fr 55px 48px;padding:8px 10px;font-size:13px}
+.modal{max-height:90vh}
+}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>NCM Decrypt</h1>
+    <button class="theme-btn" id="themeToggle" onclick="toggleTheme()" title="切换主题">&#x263e;</button>
+  </header>
+
+  <div class="upload-area" id="uploadArea">
+    <button class="btn btn-upload" id="uploadBtn" onclick="pickFiles()">&#x1f4c2; 选择 .ncm 文件</button>
+    <span class="upload-area-text">或复制文件到数据目录后点刷新</span>
+    <input type="file" id="fileInput" accept=".ncm" multiple style="display:none">
+  </div>
+
+  <div class="toolbar">
+    <button class="btn btn-primary" onclick="loadFiles()">&#x21bb; 刷新</button>
+    <button class="btn btn-success" id="btnDecrypt" onclick="startDecrypt()" disabled>&#x25b6; 解密选中</button>
+    <button class="btn btn-danger" id="btnClean" onclick="cleanFiles()" disabled>&#x1f5d1; 删源文件</button>
+    <button class="btn btn-outline" onclick="dedupFiles()">去重</button>
+    <button class="btn btn-outline" onclick="selectAll(true)">全选</button>
+    <button class="btn btn-outline" onclick="selectAll(false)">取消</button>
+  </div>
+
+  <div class="stats">
+    <span>文件: <strong id="statTotal">0</strong></span>
+    <span>已解密: <strong id="statDone">0</strong></span>
+    <span>重复: <strong id="statDup">0</strong></span>
+  </div>
+
+  <details style="margin-bottom:12px" id="settingsPanel">
+    <summary>设置</summary>
+    <div style="padding:10px 0">
+      <div class="config-row">
+        <label>数据目录</label>
+        <div class="config-path" id="dataDirDisplay" onclick="openDirPicker('data')"></div>
+      </div>
+      <div class="config-row">
+        <label>输出目录</label>
+        <div class="config-path" id="outDirDisplay" onclick="openDirPicker('output')"></div>
+      </div>
+      <div class="config-row">
+        <label><input type="checkbox" id="autoClean"> 解密后自动删除源文件</label>
+      </div>
+    </div>
+  </details>
+
+  <div id="emptyState" class="empty-state">
+    <div class="icon">&#x1f3b5;</div>
+    <p>把 .ncm 文件放到 <strong id="emptyDir" style="color:var(--text)">./</strong> 目录后点刷新</p>
+    <p style="color:var(--text4);font-size:12px;margin-top:4px">或点上方按钮选择文件上传</p>
+  </div>
+
+  <div id="fileList" style="display:none">
+    <div class="file-list">
+      <div class="file-header">
+        <span></span>
+        <span>文件名</span>
+        <span style="text-align:right">大小</span>
+        <span style="text-align:center">状态</span>
+      </div>
+      <div id="fileRows"></div>
+    </div>
+  </div>
+
+  <div id="progressSection" style="display:none;margin-bottom:16px">
+    <div class="section-title">处理进度</div>
+    <div class="file-list" id="progressList"></div>
+  </div>
+
+  <div id="outputSection" style="display:none">
+    <div class="section-title">已解密的文件</div>
+    <div id="outputList"></div>
+  </div>
+</main>
+
+<!-- Cross-directory Dedup Dialog -->
+<div class="modal-overlay" id="dedupModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>文件已解密过</h2>
+      <button class="modal-close" onclick="closeDedup()">&times;</button>
+    </div>
+    <div class="modal-body" style="padding:16px">
+      <p style="margin-bottom:12px;font-size:14px;color:var(--text)" id="dedupMsg"></p>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:16px" id="dedupSource"></p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick='dedupAction("copy")'>复制到此目录</button>
+        <button class="btn btn-outline" onclick='dedupAction("move")'>移动到此目录</button>
+        <button class="btn btn-outline" onclick='dedupAction("skip")'>跳过，重新解密</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Directory Picker Modal -->
+<div class="modal-overlay" id="dirModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="dirModalTitle">选择目录</h2>
+      <button class="modal-close" onclick="closeDirPicker()">&times;</button>
+    </div>
+    <div class="modal-path">
+      <input type="text" id="dirPathInput" onkeydown="if(event.key==='Enter')navigateTo(this.value)">
+      <button onclick="navigateTo(document.getElementById('dirPathInput').value)">跳转</button>
+    </div>
+    <div class="modal-body">
+      <div class="dir-list" id="dirList"></div>
+      <div class="shortcuts" id="shortcutsList">
+        <div class="shortcuts-title">快捷选择</div>
+        <div id="shortcutItems"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeDirPicker()">取消</button>
+      <button class="btn btn-primary" id="dirConfirmBtn" onclick="confirmDir()">确定</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var BASE = '';
+var allFiles = [], progressMap = {}, selected = new Set(), eventSource = null;
+var isDark = true;
+var dirPickerTarget = 'data';  // 'data' or 'output'
+var dirPickerCurrent = '';
+
+// ---- Theme ----
+function toggleTheme(){
+  isDark = !isDark;
+  document.body.classList.toggle('light', !isDark);
+  localStorage.setItem('ncmTheme', isDark ? 'dark' : 'light');
+}
+(function(){
+  var saved = localStorage.getItem('ncmTheme');
+  if(saved==='light'){ isDark=false; document.body.classList.add('light'); }
+})();
+
+// ---- Config ----
+function loadConfig(){
+  fetch(BASE+'/api/config').then(function(r){return r.json()}).then(function(cfg){
+    document.getElementById('dataDirDisplay').textContent = cfg.data_dir;
+    document.getElementById('outDirDisplay').textContent = cfg.output_dir;
+    document.getElementById('emptyDir').textContent = cfg.data_dir;
+    document.getElementById('dataDir').textContent = cfg.data_dir;
+    document.getElementById('outDir').textContent = cfg.output_dir;
+  }).catch(function(){});
+}
+
+// ---- Directory Picker ----
+function openDirPicker(target){
+  dirPickerTarget = target;
+  document.getElementById('dirModalTitle').textContent = target==='data' ? '选择数据目录' : '选择输出目录';
+  document.getElementById('dirModal').classList.add('active');
+  loadDirExplorer('');
+}
+function closeDirPicker(){
+  document.getElementById('dirModal').classList.remove('active');
+}
+function loadDirExplorer(path){
+  var url = BASE+'/api/explorer';
+  if(path) url += '?path='+encodeURIComponent(path);
+  fetch(url).then(function(r){return r.json()}).then(function(data){
+    if(data.error){ showToast(data.error); return; }
+    dirPickerCurrent = data.current;
+    document.getElementById('dirPathInput').value = data.current;
+    renderDirList(data);
+  }).catch(function(){showToast('无法读取目录')});
+}
+function navigateTo(path){
+  if(!path) return;
+  loadDirExplorer(path);
+}
+function renderDirList(data){
+  var list = document.getElementById('dirList');
+  list.innerHTML = '';
+  // Parent directory
+  if(data.parent){
+    var parentItem = document.createElement('div');
+    parentItem.className = 'dir-item';
+    parentItem.innerHTML = '<span class="name" style="color:var(--text3)">.. (上级目录)</span><span class="arrow">&#x2191;</span>';
+    parentItem.onclick = function(){ loadDirExplorer(data.parent); };
+    list.appendChild(parentItem);
+  }
+  for(var i=0;i<data.directories.length;i++){
+    var d = data.directories[i];
+    var item = document.createElement('div');
+    item.className = 'dir-item';
+    item.innerHTML = '<span class="name">&#x1f4c1; '+escHtml(d.name)+'</span><span class="arrow">&#x203a;</span>';
+    item.onclick = function(path){ return function(){ loadDirExplorer(path); }; }(d.path);
+    list.appendChild(item);
+  }
+  // Shortcuts
+  var sc = document.getElementById('shortcutItems');
+  sc.innerHTML = '';
+  for(var i=0;i<data.shortcuts.length;i++){
+    var s = data.shortcuts[i];
+    var el = document.createElement('span');
+    el.className = 'shortcut-item';
+    el.textContent = s.label;
+    el.onclick = function(path){ return function(){ loadDirExplorer(path); }; }(s.path);
+    sc.appendChild(el);
+  }
+}
+function confirmDir(){
+  if(!dirPickerCurrent) return;
+  var body = {};
+  if(dirPickerTarget==='data') body.data_dir = dirPickerCurrent;
+  else body.output_dir = dirPickerCurrent;
+  fetch(BASE+'/api/settings',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  }).then(function(r){return r.json()}).then(function(cfg){
+    closeDirPicker();
+    loadConfig();
+    loadFiles();
+    showToast('目录已更新');
+  }).catch(function(){showToast('设置失败')});
+}
+
+// ---- File picker (mobile-friendly) ----
+function pickFiles(){
+  document.getElementById('fileInput').click();
+}
+document.getElementById('fileInput').addEventListener('change', function(e){
+  var files = Array.from(e.target.files).filter(function(f){ return f.name.toLowerCase().indexOf('.ncm')>0; });
+  if(files.length===0){ showToast('只支持 .ncm 文件'); return; }
+  uploadFiles(files);
+  e.target.value = '';
+});
+
+document.addEventListener('dragover', function(e){ e.preventDefault(); });
+document.addEventListener('drop', function(e){
+  e.preventDefault();
+  var files = Array.from(e.dataTransfer.files).filter(function(f){ return f.name.toLowerCase().indexOf('.ncm')>0; });
+  if(files.length===0){ showToast('只支持 .ncm 文件'); return; }
+  uploadFiles(files);
+});
+
+function uploadFiles(files){
+  var formData = new FormData();
+  for(var i=0;i<files.length;i++) formData.append("files", files[i]);
+  showToast("上传中 ("+files.length+" 个)...");
+  fetch(BASE+"/api/upload",{method:"POST",body:formData})
+  .then(function(r){return r.json()}).then(function(data){
+    if(data.files&&data.files.length>0){
+      for(var i=0;i<data.files.length;i++) selected.add(data.files[i].name);
+      showToast("已添加 "+data.files.length+" 个文件");
+      refreshAll();
+    } else { showToast("上传失败"); }
+  }).catch(function(){showToast("上传失败")});
+}
+
+function loadFiles(){
+  fetch(BASE+'/api/list').then(function(r){return r.json()}).then(function(data){
+    allFiles = data;
+    render(); checkDedup();
+  }).catch(function(){showToast('加载文件列表失败')});
+}
+
+function render(){
+  var container = document.getElementById('fileRows');
+  var empty = document.getElementById('emptyState');
+  var fileList = document.getElementById('fileList');
+  var btnDecrypt = document.getElementById('btnDecrypt');
+  var btnClean = document.getElementById('btnClean');
+  document.getElementById('statTotal').textContent = allFiles.length;
+  var done = 0, hashes = {}, dups = 0;
+  for(var i=0;i<allFiles.length;i++){ var f=allFiles[i]; if(f.decrypted) done++; if(hashes[f.hash]) dups++; else hashes[f.hash]=true; }
+  document.getElementById('statDone').textContent = done;
+  document.getElementById('statDup').textContent = dups;
+  if(allFiles.length===0){
+    empty.style.display='block'; fileList.style.display='none'; btnDecrypt.disabled=true; btnClean.disabled=true; return;
+  }
+  empty.style.display='none'; fileList.style.display='block'; container.innerHTML='';
+  var hasDecrypted=false;
+  for(var i=0;i<allFiles.length;i++){
+    var f=allFiles[i]; if(f.decrypted) hasDecrypted=true;
+    var checked = selected.has(f.name)?'checked':'';
+    var row = document.createElement('div'); row.className='file-row';
+    row.innerHTML='<div class="cb"><input type="checkbox" '+checked+' onchange="toggleSel(\''+escJs(f.name)+'\',this.checked)"></div><div class="file-name" title="'+escHtml(f.name)+'">'+escHtml(f.name)+'</div><div class="file-size">'+formatSize(f.size)+'</div><div class="file-status">'+(f.decrypted?'<span class="badge badge-ok">已解密</span>':'<span class="badge badge-wait">待处理</span>')+'</div>';
+    container.appendChild(row);
+  }
+  btnDecrypt.disabled = selected.size===0;
+  btnClean.disabled = !hasDecrypted;
+}
+
+function toggleSel(name,checked){ if(checked) selected.add(name); else selected.delete(name); document.getElementById('btnDecrypt').disabled = selected.size===0; }
+function selectAll(checked){ for(var i=0;i<allFiles.length;i++){ if(checked) selected.add(allFiles[i].name); else selected.delete(allFiles[i].name); } render(); }
+
+function startDecrypt(){
+  var sel = Array.from(selected);
+  var hasDecrypted = sel.some(function(n){ var f=allFiles.find(function(x){return x.name===n;}); return f&&f.decrypted; });
+  if(hasDecrypted && !confirm("已选文件中包含已解密过的文件，是否重新解密？\n\n点「确定」重新解密全部\n点「取消」只解密未处理文件")){
+    sel = sel.filter(function(n){ var f=allFiles.find(function(x){return x.name===n;}); return !f||!f.decrypted; });
+  }
+  var files = sel;
+  if(files.length===0) return;
+  var btn = document.getElementById('btnDecrypt');
+  btn.disabled=true; btn.textContent='解密中...';
+  document.getElementById('progressSection').style.display='block';
+  var progList = document.getElementById('progressList');
+  progList.innerHTML='';
+  for(var i=0;i<files.length;i++){
+    var name=files[i];
+    var div=document.createElement('div'); div.className='file-row'; div.style.gridTemplateColumns='1fr'; div.id='prog-'+escId(name);
+    div.innerHTML='<div style="display:flex;justify-content:space-between;padding:2px 0"><span style="font-size:13px">'+escHtml(name)+'</span><span style="font-size:12px;color:var(--text3)" id="ps-'+escId(name)+'">等待中</span></div><div class="progress-cell"><div class="progress-bar"><div class="progress-fill" id="pb-'+escId(name)+'"></div></div></div>';
+    progList.appendChild(div);
+    progressMap[name]=0;
+  }
+  if(eventSource) eventSource.close();
+  eventSource = new EventSource(BASE+'/api/events');
+  eventSource.addEventListener('decrypting', onSSE);
+  eventSource.addEventListener('complete', onSSE);
+  eventSource.addEventListener('error', onSSE);
+  fetch(BASE+'/api/decrypt',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:files})}).then(function(r){return r.json()}).then(function(data){console.log('started:',data);}).catch(function(e){ btn.disabled=false; btn.textContent='▶ 解密选中'; showToast('启动失败') });
+  if(decryptTimer) clearInterval(decryptTimer); decryptTimer = setInterval(function(){
+    if(progressMap['_done_']===files.length){
+      clearInterval(decryptTimer); decryptTimer = null; if(eventSource) eventSource.close();
+      btn.disabled=false; btn.textContent='▶ 解密选中'; refreshAll();
+    }
+  },500);
+}
+
+function onSSE(e){
+  try{
+    var data=JSON.parse(e.data); if(!data.file) return;
+    var bar=document.getElementById('pb-'+escId(data.file)); var st=document.getElementById('ps-'+escId(data.file));
+    if(!bar) return;
+    var pct=Math.min(Math.max(data.progress||0,0),100); bar.style.width=pct+'%';
+    if(st){
+      if(data.state==='complete'){ st.textContent='完成 ✓'; if(!progressMap['_done_']) progressMap['_done_']=0; progressMap['_done_']++;
+        if(document.getElementById('autoClean').checked) fetch(BASE+'/api/clean',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:[data.file]})}).catch(function(){}); }
+      else if(data.state==='error'){ st.textContent='✗ '+(data.error||'失败'); if(!progressMap['_done_']) progressMap['_done_']=0; progressMap['_done_']++; }
+      else st.textContent=Math.round(pct)+'%';
+    }
+  }catch(err){}
+}
+
+function cleanFiles(){
+  if(!confirm('确定删除已解密对应的 .ncm 源文件？此操作不可恢复！')) return;
+  var toClean=[]; for(var i=0;i<allFiles.length;i++){ if(allFiles[i].decrypted) toClean.push(allFiles[i].name); }
+  if(toClean.length===0) return;
+  fetch(BASE+'/api/clean',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:toClean})})
+  .then(function(r){return r.json()}).then(function(data){ showToast('已删除 '+data.deleted+' 个文件'+(data.failed>0?'，'+data.failed+' 个失败':'')); refreshAll(); })
+  .catch(function(){showToast('删除失败')});
+}
+
+function dedupFiles(){
+  var names = allFiles.map(function(f){return f.name;});
+  fetch(BASE+'/api/dedup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:names})})
+  .then(function(r){return r.json()}).then(function(data){
+    var dups=data.duplicates||[];
+    if(dups.length===0){ showToast('没有发现重复文件'); return; }
+    for(var i=0;i<dups.length;i++) selected.delete(dups[i]);
+    if(confirm('发现 '+dups.length+' 个重复文件，删除它们吗？')){
+      fetch(BASE+'/api/clean',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files:dups})})
+      .then(function(r){return r.json()}).then(function(d){ showToast('已删除 '+d.deleted+' 个重复文件'); refreshAll(); });
+    } else showToast('检测到 '+dups.length+' 个重复文件');
+  }).catch(function(){showToast('去重失败')});
+}
+
+function refreshAll(){ loadFiles(); loadOutputs(); }
+function loadOutputs(){
+  fetch(BASE+'/api/outputs').then(function(r){return r.json()}).then(function(files){
+    var sec=document.getElementById('outputSection'), lst=document.getElementById('outputList');
+    if(!files||files.length===0){ sec.style.display='none'; return; }
+    sec.style.display='block';
+    var html='<div class="file-list">';
+    for(var i=0;i<files.length;i++){ var f=files[i]; html+='<div class="output-item"><a href="'+BASE+'/api/download?file='+encodeURIComponent(f.name)+'" download>'+escHtml(f.name)+'</a><span style="color:var(--text3);font-size:13px">'+formatSize(f.size)+'</span></div>'; }
+    html+='</div>'; lst.innerHTML=html;
+  }).catch(function(){});
+}
+
+function escHtml(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function escJs(s){ return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n'); }
+function escId(s){ return (s||'').replace(/[^a-zA-Z0-9_-]/g,'_'); }
+function formatSize(n){ if(n<1024) return n+' B'; if(n<1048576) return (n/1024).toFixed(1)+' KB'; return (n/1048576).toFixed(1)+' MB'; }
+// ---- Cross-directory dedup dialog ----
+var dedupQueue = [];
+function checkDedup(){
+  dedupQueue = allFiles.filter(function(f){ return f.existing_source && f.existing_source !== ""; });
+  if(dedupQueue.length > 0) showNextDedup();
+}
+function showNextDedup(){
+  if(dedupQueue.length === 0) return;
+  var f = dedupQueue[0];
+  document.getElementById("dedupMsg").textContent = "文件 " + f.name + " 已在其他目录解密过";
+  document.getElementById("dedupSource").textContent = "来源: " + f.existing_source;
+  document.getElementById("dedupModal").classList.add("active");
+}
+function closeDedup(){
+  document.getElementById("dedupModal").classList.remove("active");
+}
+function dedupAction(action){
+  var f = dedupQueue[0];
+  if(!f) return;
+  closeDedup();
+  fetch(BASE+"/api/resolve",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({action:action, hash:f.hash, name:f.name})
+  }).then(function(r){return r.json()}).then(function(data){
+    if(data.status==="ok"){
+      showToast(action==="skip"?"已跳过":(action==="copy"?"已复制":"已移动"));
+      dedupQueue.shift();
+      showNextDedup();
+      refreshAll();
+    } else showToast("失败: "+(data.error||"unknown"));
+  }).catch(function(){showToast("请求失败")});
+}
+
+function showToast(msg){
+  var el=document.getElementById('toastMsg');
+  if(!el){ el=document.createElement('div'); el.id='toastMsg'; el.className='toast'; document.body.appendChild(el); }
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(el._timer); el._timer=setTimeout(function(){el.classList.remove('show')},2500);
+}
+
+loadConfig();
+loadFiles();
+loadOutputs();
+</script>
+</body>
+</html>

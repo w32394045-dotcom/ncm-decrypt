@@ -1,20 +1,33 @@
 #!/bin/bash
-# NCM Decrypt — Termux 一键安装脚本
+# NCM Decrypt — Build from source / 源码编译安装脚本
 set -e
 
 echo "================================"
-echo "  NCM Decrypt 安装脚本"
+echo "  NCM Decrypt"
+echo "  Build from source / 源码编译"
 echo "================================"
 
 # 1. Check/Install Go
 if ! command -v go &>/dev/null; then
     echo ""
-    echo "[1/3] 安装 Go (约 200MB)..."
+    echo "[1/3] Installing Go... / 安装 Go..."
     echo ""
-    pkg update -y
-    pkg install golang -y
+    if command -v pkg &>/dev/null; then
+        # Termux
+        pkg update -y
+        pkg install golang -y
+    elif command -v apt &>/dev/null; then
+        sudo apt update -y
+        sudo apt install golang-go -y
+    elif command -v brew &>/dev/null; then
+        brew install go
+    else
+        echo "Please install Go first: https://go.dev/dl/"
+        echo "请先安装 Go: https://go.dev/dl/"
+        exit 1
+    fi
 else
-    echo "[1/3] Go 已安装 ($(go version))"
+    echo "[1/3] Go already installed / Go 已安装 ($(go version))"
 fi
 
 # 2. Compile

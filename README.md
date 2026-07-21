@@ -1,40 +1,53 @@
-# NCM Decrypt 🎵
+<p align="right">
+  <a href="README.zh-CN.md">🇨🇳 中文</a>
+</p>
 
-> Decrypt NetEase Cloud Music `.ncm` files — Web UI + CLI, cross-platform.
-> 网易云音乐 `.ncm` 文件解密工具 — Web UI + CLI，支持多平台。
+<h1 align="center">🎵 NCM Decrypt</h1>
 
-Decrypt encrypted `.ncm` files downloaded from NetEase Cloud Music into standard `mp3` / `flac` / `m4a` formats, with automatic metadata writing (title, artist, album, cover art).
+<p align="center">
+  <em>Decrypt NetEase Cloud Music .ncm files — Web UI + CLI, cross-platform.</em>
+</p>
 
-一键解密网易云音乐下载的加密 `.ncm` 文件，还原为通用音频格式，自动写入歌曲元数据。
+<p align="center">
+  <a href="https://github.com/w32394045-dotcom/ncm-decrypt/releases">
+    <img src="https://img.shields.io/github/v/release/w32394045-dotcom/ncm-decrypt" alt="Release">
+  </a>
+  <a href="https://www.npmjs.com/package/ncm-decrypt-cli">
+    <img src="https://img.shields.io/npm/v/ncm-decrypt-cli" alt="npm">
+  </a>
+  <a href="https://github.com/w32394045-dotcom/ncm-decrypt/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/w32394045-dotcom/ncm-decrypt" alt="License">
+  </a>
+</p>
 
 ---
 
-## ✨ Features / 特性
+Decrypt `.ncm` files downloaded from NetEase Cloud Music into standard `mp3` / `flac` / `m4a` formats, with automatic metadata writing (title, artist, album, cover art).
 
-- **Web UI** — Open in browser, drag & drop to decrypt, no CLI needed / 浏览器打开即可操作
-- **Batch parallel decryption** — Multi-worker concurrent processing / 多 worker 并发批量处理
-- **Auto format detection** — mp3 / flac / m4a / wav / ogg / aiff / ape / 自动识别格式
-- **Metadata & cover art** — ID3v2 (mp3), Vorbis Comment (flac) + cover / 自动写入标签和封面
-- **Skip cache** — Already decrypted files are skipped / 已解密文件自动跳过
-- **Cross-platform** — Linux / macOS / Windows / Termux, amd64 + arm64 / 跨平台
+## ✨ Features
 
----
+- **Web UI** — Open in browser, drag & drop to decrypt
+- **Batch parallel** — Multi-worker concurrent processing
+- **Auto detect** — mp3 / flac / m4a / wav / ogg / aiff / ape
+- **Metadata & cover** — ID3v2 (mp3), Vorbis Comment (flac), cover art
+- **Skip cache** — Already decrypted files are skipped automatically
+- **Cross-platform** — Linux / macOS / Windows / Termux, amd64 + arm64
 
-## 🚀 Quick Start / 快速开始
+## 🚀 Quick Start
 
-### Option 1: npm (Recommended / 推荐)
+### Option 1: npm (Recommended)
 
 ```bash
 npm install -g ncm-decrypt-cli
 ncm-decrypt
 ```
 
-### Option 2: Download Binary / 下载二进制
+### Option 2: Download Binary
 
-Download from [GitHub Releases](https://github.com/w32394045-dotcom/ncm-decrypt/releases)：
+Download from [GitHub Releases](https://github.com/w32394045-dotcom/ncm-decrypt/releases):
 
-| Platform / 平台 | File / 文件 |
-|------|------|
+| Platform | File |
+|----------|------|
 | Linux x86_64 | `ncm-decrypt-v1.0.0-linux-amd64` |
 | Linux ARM64 | `ncm-decrypt-v1.0.0-linux-arm64` |
 | macOS Intel | `ncm-decrypt-v1.0.0-darwin-amd64` |
@@ -52,7 +65,7 @@ chmod +x ncm-decrypt-v1.0.0-linux-amd64
 ncm-decrypt-v1.0.0-windows-amd64.exe
 ```
 
-### Option 3: Build from Source / 源码编译
+### Option 3: Build from Source
 
 ```bash
 git clone https://github.com/w32394045-dotcom/ncm-decrypt.git
@@ -61,51 +74,41 @@ go build -ldflags="-s -w" -o ncm-decrypt .
 ./ncm-decrypt
 ```
 
----
-
-## 📖 Usage / 使用说明
+## 📖 Usage
 
 Open **http://localhost:8080** in your browser after starting.
-启动后浏览器打开 **http://localhost:8080** 即可。
 
-### CLI Flags / 命令行参数
+### CLI Flags
 
 ```bash
 ./ncm-decrypt -port 8080 -dir ./ncm_files -output ./output -workers 4
 ```
 
-| Flag / 参数 | Default / 默认值 | Description / 说明 |
-|------|--------|------|
-| `-port` | `8080` | Web server port / Web 服务端口 |
-| `-host` | `0.0.0.0` | Bind address / 监听地址 |
-| `-dir` | `.` | NCM file directory / NCM 文件目录 |
-| `-output` | `./output` | Output directory / 输出目录 |
-| `-workers` | `3` | Concurrent workers / 并行线程数 |
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-port` | `8080` | Web server port |
+| `-host` | `0.0.0.0` | Bind address |
+| `-dir` | `.` | NCM file directory |
+| `-output` | `./output` | Output directory |
+| `-workers` | `3` | Concurrent workers |
 
-### Mobile Usage / 手机端使用
+### Mobile
 
 Run on Termux, then other devices on the same Wi-Fi can access `http://<phone-ip>:8080`.
-在 Termux 上运行后，同一 Wi-Fi 的设备可访问 `http://<手机IP>:8080`。
 
----
-
-## 🏗️ Tech Stack / 技术栈
+## 🏗️ Tech Stack
 
 - **Language**: Go 1.26
-- **Frontend**: Embedded single-page HTML (zero external deps) / 内嵌单页 HTML（零外部依赖）
-- **Crypto**: AES-128-ECB + RC4 (reverse-engineered NetEase scheme) / 逆向网易云加密方案
+- **Frontend**: Embedded single-page HTML (zero external dependencies)
+- **Crypto**: AES-128-ECB + RC4 (reverse-engineered NetEase scheme)
 - **Metadata**: ID3v2.3 (mp3) / Vorbis Comment + Picture Block (flac)
 
----
+## 📦 Distribution
 
-## 📦 Distribution / 发布渠道
-
-| Channel / 渠道 | URL / 地址 |
-|------|------|
+| Channel | URL |
+|---------|-----|
 | GitHub | https://github.com/w32394045-dotcom/ncm-decrypt |
 | npm | https://www.npmjs.com/package/ncm-decrypt-cli |
-
----
 
 ## 📄 License
 

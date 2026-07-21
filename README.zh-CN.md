@@ -1,0 +1,115 @@
+<p align="right">
+  <a href="README.md">🇬🇧 English</a>
+</p>
+
+<h1 align="center">🎵 NCM Decrypt</h1>
+
+<p align="center">
+  <em>网易云音乐 .ncm 文件解密工具 — Web UI + CLI，支持多平台</em>
+</p>
+
+<p align="center">
+  <a href="https://github.com/w32394045-dotcom/ncm-decrypt/releases">
+    <img src="https://img.shields.io/github/v/release/w32394045-dotcom/ncm-decrypt" alt="Release">
+  </a>
+  <a href="https://www.npmjs.com/package/ncm-decrypt-cli">
+    <img src="https://img.shields.io/npm/v/ncm-decrypt-cli" alt="npm">
+  </a>
+  <a href="https://github.com/w32394045-dotcom/ncm-decrypt/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/w32394045-dotcom/ncm-decrypt" alt="License">
+  </a>
+</p>
+
+---
+
+一键解密网易云音乐下载的加密 `.ncm` 文件，还原为通用的 `mp3` / `flac` / `m4a` 等格式，自动写入歌曲元数据（标题、艺术家、专辑、封面）。
+
+## ✨ 特性
+
+- **Web UI 操作** — 浏览器打开即可拖拽选择文件解密，无需记命令
+- **批量并行解密** — 多 worker 并发处理
+- **自动格式识别** — 自动识别 mp3 / flac / m4a / wav / ogg / aiff / ape
+- **元数据与封面** — 自动写入 ID3v2 (mp3) 标签 / Vorbis Comment (flac) 标签 + 封面图
+- **去重跳过** — 已解密的文件自动跳过，避免重复
+- **跨平台** — Linux / macOS / Windows / Termux，支持 amd64 + arm64
+
+## 🚀 快速开始
+
+### 方式一：npm 安装（推荐）
+
+```bash
+npm install -g ncm-decrypt-cli
+ncm-decrypt
+```
+
+### 方式二：直接下载二进制
+
+从 [GitHub Releases](https://github.com/w32394045-dotcom/ncm-decrypt/releases) 下载对应平台的二进制文件：
+
+| 平台 | 文件 |
+|------|------|
+| Linux x86_64 | `ncm-decrypt-v1.0.0-linux-amd64` |
+| Linux ARM64 | `ncm-decrypt-v1.0.0-linux-arm64` |
+| macOS Intel | `ncm-decrypt-v1.0.0-darwin-amd64` |
+| macOS Apple Silicon | `ncm-decrypt-v1.0.0-darwin-arm64` |
+| Windows x86_64 | `ncm-decrypt-v1.0.0-windows-amd64.exe` |
+| Windows ARM64 | `ncm-decrypt-v1.0.0-windows-arm64.exe` |
+| Termux (Android) | `ncm-decrypt-v1.0.0-termux-arm64` |
+
+```bash
+# Linux / macOS
+chmod +x ncm-decrypt-v1.0.0-linux-amd64
+./ncm-decrypt-v1.0.0-linux-amd64
+
+# Windows
+ncm-decrypt-v1.0.0-windows-amd64.exe
+```
+
+### 方式三：源码编译
+
+```bash
+git clone https://github.com/w32394045-dotcom/ncm-decrypt.git
+cd ncm-decrypt
+go build -ldflags="-s -w" -o ncm-decrypt .
+./ncm-decrypt
+```
+
+## 📖 使用说明
+
+启动后浏览器打开 **http://localhost:8080** 即可看到 Web 界面。
+
+### 命令行参数
+
+```bash
+./ncm-decrypt -port 8080 -dir ./ncm_files -output ./output -workers 4
+```
+
+| 参数 | 默认值 | 说明 |
+|------|--------|------|
+| `-port` | `8080` | Web 服务端口 |
+| `-host` | `0.0.0.0` | 监听地址 |
+| `-dir` | `.` | NCM 文件所在目录 |
+| `-output` | `./output` | 输出目录 |
+| `-workers` | `3` | 并行工作线程数 |
+
+### 手机端使用
+
+在 Termux 上运行后，同一 Wi-Fi 下的其他设备可以访问 `http://<手机IP>:8080`。
+
+## 🏗️ 技术栈
+
+- **语言**: Go 1.26
+- **前端**: 内嵌单页 HTML（零外部依赖）
+- **加密**: AES-128-ECB + RC4（逆向网易云音乐加密方案）
+- **元数据**: ID3v2.3 (mp3) / Vorbis Comment + Picture Block (flac)
+
+## 📦 发布渠道
+
+| 渠道 | 地址 |
+|------|------|
+| GitHub | https://github.com/w32394045-dotcom/ncm-decrypt |
+| npm | https://www.npmjs.com/package/ncm-decrypt-cli |
+
+## 📄 License
+
+MIT

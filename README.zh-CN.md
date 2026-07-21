@@ -12,8 +12,8 @@
   <a href="https://github.com/w32394045-dotcom/ncm-decrypt/releases">
     <img src="https://img.shields.io/github/v/release/w32394045-dotcom/ncm-decrypt" alt="Release">
   </a>
-  <a href="https://www.npmjs.com/package/ncm-decrypt-cli">
-    <img src="https://img.shields.io/npm/v/ncm-decrypt-cli" alt="npm">
+  <a href="https://www.npmjs.com/package/ncm-decrypt-server">
+    <img src="https://img.shields.io/npm/v/ncm-decrypt-server" alt="npm">
   </a>
   <a href="https://github.com/w32394045-dotcom/ncm-decrypt/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/w32394045-dotcom/ncm-decrypt" alt="License">
@@ -38,7 +38,7 @@
 ### 方式一：npm 安装（推荐）
 
 ```bash
-npm install -g ncm-decrypt-cli
+npm install -g ncm-decrypt-server
 ncm-decrypt
 ```
 
@@ -108,7 +108,7 @@ go build -ldflags="-s -w" -o ncm-decrypt .
 | 渠道 | 地址 |
 |------|------|
 | GitHub | https://github.com/w32394045-dotcom/ncm-decrypt |
-| npm | https://www.npmjs.com/package/ncm-decrypt-cli |
+| npm | https://www.npmjs.com/package/ncm-decrypt-server |
 
 ## 📄 License
 

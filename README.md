@@ -12,8 +12,8 @@
   <a href="https://github.com/w32394045-dotcom/ncm-decrypt/releases">
     <img src="https://img.shields.io/github/v/release/w32394045-dotcom/ncm-decrypt" alt="Release">
   </a>
-  <a href="https://www.npmjs.com/package/ncm-decrypt-cli">
-    <img src="https://img.shields.io/npm/v/ncm-decrypt-cli" alt="npm">
+  <a href="https://www.npmjs.com/package/ncm-decrypt-server">
+    <img src="https://img.shields.io/npm/v/ncm-decrypt-server" alt="npm">
   </a>
   <a href="https://github.com/w32394045-dotcom/ncm-decrypt/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/w32394045-dotcom/ncm-decrypt" alt="License">
@@ -38,7 +38,7 @@ Decrypt `.ncm` files downloaded from NetEase Cloud Music into standard `mp3` / `
 ### Option 1: npm (Recommended)
 
 ```bash
-npm install -g ncm-decrypt-cli
+npm install -g ncm-decrypt-server
 ncm-decrypt
 ```
 
@@ -108,7 +108,7 @@ Run on Termux, then other devices on the same Wi-Fi can access `http://<phone-ip
 | Channel | URL |
 |---------|-----|
 | GitHub | https://github.com/w32394045-dotcom/ncm-decrypt |
-| npm | https://www.npmjs.com/package/ncm-decrypt-cli |
+| npm | https://www.npmjs.com/package/ncm-decrypt-server |
 
 ## 📄 License
 

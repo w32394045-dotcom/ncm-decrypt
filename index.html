@@ -9,7 +9,7 @@
 :root{--bg:#0f0f13;--surface:#18181b;--surface2:#1f1f23;--text:#e4e4e7;--text2:#a1a1aa;--text3:#71717a;--text4:#52525b;--border:#27272a;--accent:#7c3aed;--accent2:#6d28d9;--btn-disabled:#3f3f46;--btn-disabled-text:#71717a;--red:#dc2626;--red-hover:#b91c1c;--green:#16a34a;--green-hover:#15803d;--prog-bg:#27272a;--badge-ok-bg:#052e16;--badge-ok:#4ade80;--badge-wait-bg:#1c1917;--badge-run-bg:#1e1b4b;--badge-run:#818cf8;--badge-err-bg:#450a0a;--badge-err:#f87171;--toast-bg:#18181b;--toast-border:#27272a;--toast-shadow:0 8px 32px rgba(0,0,0,.4);--overlay:rgba(0,0,0,.6);--dir-icon:#f59e0b;--file-icon:#818cf8}
 .light{--bg:#f5f5f5;--surface:#fff;--surface2:#f0f0f0;--text:#1a1a1a;--text2:#525252;--text3:#8a8a8a;--text4:#a3a3a3;--border:#d4d4d4;--btn-disabled:#e5e5e5;--btn-disabled-text:#a3a3a3;--prog-bg:#e5e5e5;--badge-ok-bg:#dcfce7;--badge-ok:#16a34a;--badge-wait-bg:#f5f5f5;--badge-run-bg:#ede9fe;--badge-run:#6d28d9;--badge-err-bg:#fde8e8;--badge-err:#dc2626;--toast-bg:#fff;--toast-border:#d4d4d4;--toast-shadow:0 8px 32px rgba(0,0,0,.1);--overlay:rgba(0,0,0,.3);--dir-icon:#d97706;--file-icon:#6366f1}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent}
-main{max-width:960px;margin:0 auto;padding:20px 16px 60px}
+main{max-width:960px;margin:0 auto;padding:20px 16px 60px;overflow-x:hidden}
 header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
 h1{font-size:22px;font-weight:700;background:linear-gradient(135deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -65,18 +65,18 @@ h1{font-size:22px;font-weight:700;background:linear-gradient(135deg,#a78bfa,#636
 .auth-badge{display:inline-flex;align-items:center;gap:6px;background:var(--badge-run-bg);color:var(--badge-run);padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500}
 .auth-badge button{background:none;border:none;color:var(--badge-run);cursor:pointer;font-size:14px;padding:0 2px}
 /* File listing */
-.file-grid{display:grid;grid-template-columns:auto 1fr auto auto;gap:0}
+.file-grid{display:grid;grid-template-columns:auto 1fr auto auto;gap:0;width:100%}
 .file-grid-header{display:contents}
 .file-grid-header > div{padding:8px 14px;background:var(--surface2);font-size:12px;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border)}
 .file-row{display:contents;cursor:pointer}
-.file-row > div{padding:8px 14px;border-bottom:1px solid var(--border);font-size:14px;display:flex;align-items:center;gap:6px;transition:background .1s}
+.file-row > div{padding:8px 14px;border-bottom:1px solid var(--border);font-size:14px;display:flex;align-items:center;gap:6px;transition:background .1s;min-width:0;overflow:hidden}
 .file-row:hover > div{background:var(--surface2)}
 .file-row:last-child > div{border-bottom:none}
 .file-icon{font-size:16px;flex-shrink:0}
 .file-icon-dir{color:var(--dir-icon)}
 .file-icon-file{color:var(--file-icon)}
 .file-icon-ncm{color:var(--accent)}
-.file-name-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-name-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .file-actions{display:flex;gap:4px;justify-content:flex-end}
 .file-size-text{font-size:13px;color:var(--text3);white-space:nowrap;text-align:right}
 .selected-row > div{background:var(--badge-run-bg) !important}
@@ -105,14 +105,14 @@ details.settings-panel{margin-bottom:12px}
 /* Modal */
 .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--overlay);z-index:9999;justify-content:center;align-items:center;padding:16px}
 .modal-overlay.active{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:100%;max-width:420px;box-shadow:var(--toast-shadow)}
-.modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:100%;max-width:420px;box-shadow:var(--toast-shadow);display:flex;flex-direction:column;max-height:80vh}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
 .modal-header h2{font-size:16px;font-weight:600}
 .modal-close{background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;padding:0 4px}
-.modal-body{padding:16px}
+.modal-body{padding:16px;overflow-y:auto;flex:1;min-height:0}
 .modal-body input[type=text]{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:14px;outline:none}
 .modal-body input[type=text]:focus{border-color:var(--accent)}
-.modal-footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--border)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0}
 .modal-footer .btn{padding:8px 20px;font-size:14px}
 /* Upload area */
 .upload-area{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:10px 14px;background:var(--surface);border:2px dashed var(--border);border-radius:10px;flex-wrap:wrap}
@@ -127,12 +127,12 @@ details.settings-panel{margin-bottom:12px}
 .lang-option.active{color:var(--accent);font-weight:600}
 /* Dir picker modal */
 .dir-list{padding:4px 0}
-.dir-item{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s}
+.dir-item{display:flex;align-items:center;gap:8px;padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s;overflow:hidden}
 .dir-item:hover{background:var(--surface2)}
 .dir-item:last-child{border-bottom:none}
-.dir-item .name{font-size:14px}
+.dir-item .name{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 .dir-item .arrow{color:var(--text3);font-size:16px}
-.modal-path{display:flex;align-items:center;gap:6px;padding:10px 16px;border-bottom:1px solid var(--border)}
+.modal-path{display:flex;align-items:center;gap:6px;padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0;overflow:hidden}
 .modal-path input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px 10px;font-size:13px;font-family:monospace}
 .modal-path button{padding:8px 12px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-size:13px;cursor:pointer}
 .shortcuts{padding:8px 16px 12px;border-top:1px solid var(--border)}
@@ -249,6 +249,26 @@ h1{font-size:18px}
             </div>
           </div>
           <div id="fileGrid" class="file-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simple NCM File List (mode 0) -->
+    <div id="simpleFileList" style="display:none">
+      <div class="panel" id="ncmListPanel">
+        <div class="panel-header">
+          <span>.ncm Files</span>
+        </div>
+        <div id="ncmListBody">
+          <div class="file-grid" id="ncmListHeader">
+            <div class="file-grid-header">
+              <div></div>
+              <div>Name</div>
+              <div style="text-align:right">Size</div>
+              <div style="text-align:center">Status</div>
+            </div>
+          </div>
+          <div id="ncmListRows"></div>
         </div>
       </div>
     </div>
@@ -708,9 +728,13 @@ function showAppScreen() {
   if (MODE === 1) {
     document.getElementById('configDataDir').style.display = 'none';
     document.getElementById('configOutDir').style.display = 'none';
+    document.getElementById('fileBrowser').style.display = 'block';
+    document.getElementById('simpleFileList').style.display = 'none';
   } else {
     document.getElementById('configDataDir').style.display = 'flex';
     document.getElementById('configOutDir').style.display = 'flex';
+    document.getElementById('fileBrowser').style.display = 'none';
+    document.getElementById('simpleFileList').style.display = 'block';
   }
   // Build language dropdown
   buildLangDropdown();
@@ -946,6 +970,35 @@ function updateStats() {
   document.getElementById('statDup').textContent = dups;
   // Enable/disable decrypt button
   document.getElementById('btnDecrypt').disabled = selected.size === 0;
+}
+
+function renderSimpleNcmList() {
+  var container = document.getElementById('ncmListRows');
+  if (!container) return;
+  container.innerHTML = '';
+  if (!ncmFiles || ncmFiles.length === 0) {
+    container.innerHTML = '<div class="empty-state" style="padding:30px"><div class="icon">&#x1f3b5;</div><p>' + __('no_files', 'No .ncm files found') + '</p></div>';
+    return;
+  }
+  ncmFiles.forEach(function(f) {
+    var row = document.createElement('div');
+    row.className = 'file-row';
+    var checked = selected.has(f.name) ? 'checked' : '';
+    row.innerHTML = '<div class="cb" style="justify-self:center"><input type="checkbox" ' + checked + ' onchange="toggleNcmSel(\'' + escJs(f.name) + '\',this.checked)" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer"></div>'
+      + '<div class="file-name-text">' + escHtml(f.name) + '</div>'
+      + '<div class="file-size-text" style="text-align:right;color:var(--text3);font-size:13px">' + formatSize(f.size) + '</div>'
+      + '<div style="text-align:center;font-size:13px">' + (f.decrypted ? '<span class="badge badge-ok">' + __('status_decrypted', 'Decrypted') + '</span>' : '<span class="badge badge-wait">' + __('status_pending', 'Pending') + '</span>') + '</div>';
+    container.appendChild(row);
+  });
+}
+
+
+function loadNcmFileList() {
+  api('/api/list').then(function(r){ return r.json(); }).then(function(data) {
+    ncmFiles = data || [];
+    if (MODE === 0) renderSimpleNcmList();
+    updateStats();
+  }).catch(function(){});
 }
 
 var ncmSelected = new Set();
